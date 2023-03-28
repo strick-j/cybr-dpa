@@ -23,7 +23,7 @@ func (s *Service) GetPublicKeys(ctx context.Context, workspaceID, workspaceType 
 		return "", fmt.Errorf("connector type not allowed, valid types are AWS, AZURE, ON-PREMISE")
 	}
 
-	pathEscapedQuery := url.PathEscape("workpaceId=" + workspaceID + "&workspaceType" + workspaceType)
+	pathEscapedQuery := url.PathEscape("workpaceId=" + workspaceID + "&workspaceType=" + workspaceType)
 	if err := s.client.Get(ctx, fmt.Sprintf("/%s?%s", "public-keys", pathEscapedQuery), PublicKey); err != nil {
 		return "", fmt.Errorf("failed to get public key: %w", err)
 	}

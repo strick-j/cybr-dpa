@@ -9,6 +9,6 @@ type Settings struct {
 }
 
 type FeatureConf struct {
-	IsMfaCachingEnabled  bool `json:"isMfaCachingEnabled,omitempty"`
-	KeyExpirationTimeSec int  `json:"keyExpirationTimeSec,omitempty"`
+	IsMfaCachingEnabled  bool `json:"is_mfa_caching_enabled,omitempty"`
+	KeyExpirationTimeSec int  `json:"key_expiration_time_sec,omitempty"`
 }

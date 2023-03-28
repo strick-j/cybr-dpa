@@ -47,13 +47,14 @@ func OauthCredClient(clientID, clientSecret, clientAppID, clientURL string, clie
 
 // OauthResourceOwner returns a validated Oauth2 Authentication Token with Refresh Token based on the following provided information:
 //
-//	clientID - Username for the SCIM Application (e.g. "identity-privilege-integration-user$@example.com")
-//	clientSecret - Password for the SCIM Application
-//	clientAppID - ID for the SCIM Application
-//	clientURL - URL for the SCIM Application (e.g. "example.my.idaptive.app")
+//	clientID - Username for the Application (e.g. "identity-privilege-integration-user$@example.com")
+//	clientSecret - Password for the Application
+//	clientAppID - ID for the Application
+//	clientURL - URL for the Application (e.g. "example.my.idaptive.app")
+//	clientScope - Scopes for Application
 //	resourceUsername - Username for the Resource Owner
 //	resourcePassword - Password for the Resource Owner
-func OauthResourceOwner(clientID, clientSecret, clientAppID, clientURL, resourceUsername, resourcePassword string) (*oauth2.Token, error) {
+func OauthResourceOwner(clientID, clientSecret, clientAppID, clientURL, resourceUsername, resourcePassword string, clientScope []string) (*oauth2.Token, error) {
 	endpoint := oauth2.Endpoint{
 		AuthURL:   "https://" + clientURL + "/oauth2/authorize/" + clientAppID,
 		TokenURL:  "https://" + clientURL + "/oauth2/token/" + clientAppID,
@@ -65,7 +66,7 @@ func OauthResourceOwner(clientID, clientSecret, clientAppID, clientURL, resource
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		Endpoint:     endpoint,
-		Scopes:       []string{"scim"},
+		Scopes:       clientScope,
 	}
 
 	ctx := context.Background()

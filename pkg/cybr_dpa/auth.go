@@ -14,19 +14,20 @@ type tokenSource struct {
 }
 
 // OauthCredClient returns a validated Oauth2 Authentication Token based on the following provided information:
-//   clientID - Username for the Application (e.g. "identity-privilege-integration-user$@example.com")
-//   clientSecret - Password for the Application
-//   clientAppID - ID for the Application
-//   clientURL - URL for the Application (e.g. "example.my.idaptive.app")
-//   clientScope - Scopes for Application
-func OauthCredClient(clientID, clientSecret, clientAppID, clientURL, clientScope[] string) (*oauth2.Token, error) {
+//
+//	clientID - Username for the Application (e.g. "identity-privilege-integration-user$@example.com")
+//	clientSecret - Password for the Application
+//	clientAppID - ID for the Application
+//	clientURL - URL for the Application (e.g. "example.my.idaptive.app")
+//	clientScope - Scopes for Application
+func OauthCredClient(clientID, clientSecret, clientAppID, clientURL string, clientScope []string) (*oauth2.Token, error) {
 	// Establish oauth2/clientcredentials config with user provided data
 	var credentialConfig = clientcredentials.Config{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		TokenURL:     "https://" + clientURL + "/oauth2/token/" + clientAppID,
 		AuthStyle:    0,
-		Scopes:       clientScope[],
+		Scopes:       clientScope,
 	}
 
 	// Create tokenSource with provided configuration info
@@ -45,12 +46,13 @@ func OauthCredClient(clientID, clientSecret, clientAppID, clientURL, clientScope
 }
 
 // OauthResourceOwner returns a validated Oauth2 Authentication Token with Refresh Token based on the following provided information:
-//   clientID - Username for the SCIM Application (e.g. "identity-privilege-integration-user$@example.com")
-//   clientSecret - Password for the SCIM Application
-//   clientAppID - ID for the SCIM Application
-//   clientURL - URL for the SCIM Application (e.g. "example.my.idaptive.app")
-//   resourceUsername - Username for the Resource Owner
-//   resourcePassword - Password for the Resource Owner
+//
+//	clientID - Username for the SCIM Application (e.g. "identity-privilege-integration-user$@example.com")
+//	clientSecret - Password for the SCIM Application
+//	clientAppID - ID for the SCIM Application
+//	clientURL - URL for the SCIM Application (e.g. "example.my.idaptive.app")
+//	resourceUsername - Username for the Resource Owner
+//	resourcePassword - Password for the Resource Owner
 func OauthResourceOwner(clientID, clientSecret, clientAppID, clientURL, resourceUsername, resourcePassword string) (*oauth2.Token, error) {
 	endpoint := oauth2.Endpoint{
 		AuthURL:   "https://" + clientURL + "/oauth2/authorize/" + clientAppID,

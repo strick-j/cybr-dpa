@@ -9,6 +9,7 @@ import (
 
 var (
 	Policies types.Policies
+	Policy   types.Policy
 )
 
 // GetPolicies: Returns all authorization policies
@@ -29,12 +30,12 @@ func (s *Service) GetPolicies(ctx context.Context) (*types.Policies, error) {
 // Example Usage:
 //
 //	getPolicyById err := s.GetPolicyById(context.Background, "{policy_id}")
-func (s *Service) GetPolicyById(ctx context.Context, policyId string) (*types.Policies, error) {
-	if err := s.client.Get(ctx, fmt.Sprintf("/%s/%s", "access-policies", policyId), &Policies); err != nil {
+func (s *Service) GetPolicyById(ctx context.Context, policyId string) (*types.Policy, error) {
+	if err := s.client.Get(ctx, fmt.Sprintf("/%s/%s", "access-policies", policyId), &Policy); err != nil {
 		return nil, fmt.Errorf("failed to get policy %s: %w", policyId, err)
 	}
 
-	return &Policies, nil
+	return &Policy, nil
 }
 
 // DeletePolicyById: Deletes the specified policy

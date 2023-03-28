@@ -28,11 +28,24 @@ func (s *Service) GetPolicies(ctx context.Context) (*types.Policies, error) {
 //
 // Example Usage:
 //
-//	getPolicies, err := s.GetPolicyById(context.Background, "{policy_id}")
+//	getPolicyById err := s.GetPolicyById(context.Background, "{policy_id}")
 func (s *Service) GetPolicyById(ctx context.Context, policyId string) (*types.Policies, error) {
 	if err := s.client.Get(ctx, fmt.Sprintf("/%s/%s", "access-policies", policyId), &Policies); err != nil {
-		return nil, fmt.Errorf("failed to get policy: %w", err)
+		return nil, fmt.Errorf("failed to get policy %s: %w", policyId, err)
 	}
 
 	return &Policies, nil
+}
+
+// DeletePolicyById: Deletes the specified policy
+//
+// Example Usage:
+//
+//	DeletePolicyById, err := s.DeletePolicyById(context.Background, "{policy_id}")
+func (s *Service) DeletePolicyById(ctx context.Context, policyId string) error {
+	if err := s.client.Delete(ctx, fmt.Sprintf("/%s/%s", "access-policies", policyId), nil); err != nil {
+		return fmt.Errorf("failed to delete policy %s: %w", policyId, err)
+	}
+
+	return nil
 }

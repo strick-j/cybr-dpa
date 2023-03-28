@@ -21,13 +21,13 @@ var (
 //	}
 //	getConnectorScript, err := s.GetConnectorScript(context.Background, connectorRequest)
 func (s *Service) GetConnectorScript(ctx context.Context, connectorRequest types.ConnectorRequest) (*types.ConnectorScript, error) {
-	allowedType := []string{"AWS", "AZURE", "ON-PREMISE"}
+	//allowedType := []string{"AWS", "AZURE", "ON-PREMISE"}
 
-	if typeAllowed := contains(allowedType, connectorRequest.ConnectorType); !typeAllowed {
-		return nil, fmt.Errorf("connector type not allowed, valid types are AWS, AZURE, ON-PREMISE")
-	}
+	//if typeAllowed := contains(allowedType, connectorRequest.ConnectorType); !typeAllowed {
+	//	return nil, fmt.Errorf("connector type not allowed, valid types are AWS, AZURE, ON-PREMISE")
+	//}
 
-	if err := s.client.Post(ctx, fmt.Sprintf("/%s/%s", "Connectors", "setup-script"), connectorRequest, &ConnectorScript); err != nil {
+	if err := s.client.Post(ctx, fmt.Sprintf("/%s/%s", "connectors", "setup-script"), connectorRequest, &ConnectorScript); err != nil {
 		return nil, fmt.Errorf("failed to get Connector Install Script: %w", err)
 	}
 

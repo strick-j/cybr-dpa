@@ -13,6 +13,35 @@ type tokenSource struct {
 	conf *clientcredentials.Config
 }
 
+// OauthPlatform Token returns a validated Oauth2 Authentication Token based on the following provided information:
+//
+//	clientID - Username for the Application (e.g. "identity-privilege-integration-user$@example.com")
+//	clientSecret - Password for the Application
+//	clientURL - URL for the Application (e.g. "example.my.idaptive.app")
+func OauthPlatformToken(clientID, clientSecret, clientURL string) (*oauth2.Token, error) {
+	// Establish oauth2/clientcredentials config with user provided data
+	var credentialConfig = clientcredentials.Config{
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+		TokenURL:     "https://" + clientURL + "/oauth2/token/platform",
+		AuthStyle:    0,
+	}
+
+	// Create tokenSource with provided configuration info
+	ts := &tokenSource{
+		ctx:  context.Background(),
+		conf: &credentialConfig,
+	}
+
+	// Request new token from SCIM server using Client Credentials
+	authToken, err := ts.conf.Token(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("failed to obtain SCIM Oauth2 Token %w", err)
+	}
+
+	return authToken, nil
+}
+
 // OauthCredClient returns a validated Oauth2 Authentication Token based on the following provided information:
 //
 //	clientID - Username for the Application (e.g. "identity-privilege-integration-user$@example.com")

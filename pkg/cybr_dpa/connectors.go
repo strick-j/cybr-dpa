@@ -23,7 +23,7 @@ var (
 func (s *Service) GetConnectorScript(ctx context.Context, connectorRequest types.ConnectorRequest) (*types.ConnectorScript, error) {
 	allowedType := []string{"AWS", "AZURE", "ON-PREMISE"}
 
-	if typeAllowed := contains(allowedType, connectorRequest.ConnectorType); typeAllowed != true {
+	if typeAllowed := contains(allowedType, connectorRequest.ConnectorType); !typeAllowed {
 		return nil, fmt.Errorf("connector type not allowed, valid types are AWS, AZURE, ON-PREMISE")
 	}
 

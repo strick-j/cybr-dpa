@@ -16,17 +16,17 @@ var (
 // Example Usage:
 //
 //	getPublicKeys, err := s.GetPublicKeys(context.Background, "cb5544d2-678e7-45f0-823e-555dc6f38ea6", "Azure")
-func (s *Service) GetPublicKeys(ctx context.Context, workspaceID, workspaceType string) (*string, error) {
+func (s *Service) GetPublicKeys(ctx context.Context, workspaceID, workspaceType string) (string, error) {
 
 	allowedType := []string{"AWS", "Azure"}
 	if typeAllowed := contains(allowedType, workspaceType); !typeAllowed {
-		return nil, fmt.Errorf("connector type not allowed, valid types are AWS, AZURE, ON-PREMISE")
+		return "", fmt.Errorf("connector type not allowed, valid types are AWS, AZURE, ON-PREMISE")
 	}
 
-	pathEscapedQuery := url.PathEscape("workpaceid=" + workspaceID + "&workspacetype" + workspaceType)
-	if err := s.client.Get(ctx, fmt.Sprintf("/%s?%s", "public-keys", pathEscapedQuery), &PublicKey); err != nil {
-		return nil, fmt.Errorf("failed to get public key: %w", err)
+	pathEscapedQuery := url.PathEscape("workpaceId=" + workspaceID + "&workspaceType" + workspaceType)
+	if err := s.client.Get(ctx, fmt.Sprintf("/%s?%s", "public-keys", pathEscapedQuery), PublicKey); err != nil {
+		return "", fmt.Errorf("failed to get public key: %w", err)
 	}
 
-	return &PublicKey, nil
+	return PublicKey, nil
 }

@@ -27,7 +27,7 @@ func (s *Service) GetConnectorScript(ctx context.Context, connectorRequest types
 		return nil, fmt.Errorf("connector type not allowed, valid types are AWS, AZURE, ON-PREMISE")
 	}
 
-	if err := s.client.Post(ctx, fmt.Sprintf("/%s/%s/%s", "api", "Connectors", "setup-script"), connectorRequest, &ConnectorScript); err != nil {
+	if err := s.client.Post(ctx, fmt.Sprintf("/%s/%s", "Connectors", "setup-script"), connectorRequest, &ConnectorScript); err != nil {
 		return nil, fmt.Errorf("failed to get Connector Install Script: %w", err)
 	}
 

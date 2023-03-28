@@ -23,7 +23,7 @@ func OauthPlatformToken(clientID, clientSecret, clientURL string) (*oauth2.Token
 	var credentialConfig = clientcredentials.Config{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
-		TokenURL:     "https://" + clientURL + "/oauth2/token/platformtoken",
+		TokenURL:     "https://" + clientURL + "/oauth2/platformtoken",
 		AuthStyle:    0,
 		Scopes:       []string{""},
 	}

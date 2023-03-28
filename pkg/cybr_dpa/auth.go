@@ -24,7 +24,7 @@ func OauthPlatformToken(clientID, clientSecret, clientURL string) (*oauth2.Token
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		TokenURL:     "https://" + clientURL + "/oauth2/platformtoken",
-		AuthStyle:    2,
+		AuthStyle:    1,
 	}
 
 	// Create tokenSource with provided configuration info

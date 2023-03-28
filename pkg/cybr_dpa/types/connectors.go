@@ -1,4 +1,4 @@
-package cybr_dpa
+package types
 
 type Connectors struct {
 	ScriptUrl   string `json:"script_url"`

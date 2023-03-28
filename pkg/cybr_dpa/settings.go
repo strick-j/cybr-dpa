@@ -45,7 +45,7 @@ func (s *Service) PutSettingsByFeature(ctx context.Context, featureName string, 
 //		IsMfaCachingEnabled: true,
 //		KeyExpirationTimeSec: 900,
 //	}
-//	putSettingsByFeature, err := s.PutSettingsByFeature(context.Background, "MFA_CACHING", settingsUpdate)
+//	patchSettingsByFeature, err := s.PatchSettingsByFeature(context.Background, "MFA_CACHING", settingsUpdate)
 func (s *Service) PatchSettingsByFeature(ctx context.Context, featureName string, featureConf types.FeatureConf) (*types.Settings, error) {
 	if err := s.client.Patch(ctx, fmt.Sprintf("/%s/%s", "settings", featureName), featureConf, &Settings); err != nil {
 		return nil, fmt.Errorf("failed to get Connector Install Script: %w", err)

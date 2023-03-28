@@ -15,7 +15,7 @@ type transport struct {
 	token string
 }
 
-func NewService(clientURL string, clientApiEndpoint string, clientApiVersion string, verbose bool, authToken *oauth2.Token) *Service {
+func NewService(clientURL string, clientApiEndpoint string, verbose bool, authToken *oauth2.Token) *Service {
 	t := transport{
 		token: authToken.AccessToken,
 	}
@@ -24,7 +24,7 @@ func NewService(clientURL string, clientApiEndpoint string, clientApiVersion str
 		client: NewClient(
 			&http.Client{Transport: &t},
 			Options{
-				ApiURL:  fmt.Sprintf("https://%s/%s/%s", clientURL, clientApiEndpoint, clientApiVersion),
+				ApiURL:  fmt.Sprintf("https://%s/%s", clientURL, clientApiEndpoint),
 				Verbose: verbose,
 			},
 		),

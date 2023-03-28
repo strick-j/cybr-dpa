@@ -28,7 +28,7 @@ func (s *Service) GetSettingsByFeature(ctx context.Context, featureName string) 
 //
 //	settingsUpdate := types.FeatureConf {
 //		IsMfaCachingEnabled: true,
-//		KeyExpirationTimeSec: 900
+//		KeyExpirationTimeSec: 900,
 //	}
 //	putSettingsByFeature, err := s.PutSettingsByFeature(context.Background, "MFA_CACHING", settingsUpdate)
 func (s *Service) PutSettingsByFeature(ctx context.Context, featureName string, featureConf types.FeatureConf) (*types.Settings, error) {
@@ -43,7 +43,7 @@ func (s *Service) PutSettingsByFeature(ctx context.Context, featureName string, 
 //
 //	settingsUpdate := types.FeatureConf {
 //		IsMfaCachingEnabled: true,
-//		KeyExpirationTimeSec: 900
+//		KeyExpirationTimeSec: 900,
 //	}
 //	putSettingsByFeature, err := s.PutSettingsByFeature(context.Background, "MFA_CACHING", settingsUpdate)
 func (s *Service) PatchSettingsByFeature(ctx context.Context, featureName string, featureConf types.FeatureConf) (*types.Settings, error) {

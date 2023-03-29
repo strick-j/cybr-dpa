@@ -155,14 +155,14 @@ func (c *Client) doRequest(r *http.Request, v interface{}) error {
 	fmt.Println("\n\nMIME: " + contentType)
 
 	var buf bytes.Buffer
-	dec := json.NewDecoder(io.TeeReader(resp.Body, &buf))
 
 	if contentType == "text/plain" {
+		fmt.Printf("%s", buf.String())
 		v = buf.String()
 	}
 
 	if contentType == "application/json" {
-		//dec := json.NewDecoder(io.TeeReader(resp.Body, &buf))
+		dec := json.NewDecoder(io.TeeReader(resp.Body, &buf))
 		if err := dec.Decode(v); err != nil {
 			return fmt.Errorf("could not parse response body: %w [%s:%s] %s", err, r.Method, r.URL.String(), buf.String())
 		}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 type PublicKeyScript struct {
@@ -41,6 +42,18 @@ func (s *Service) GetPublicKey(ctx context.Context, workspaceID, workspaceType s
 
 	pathEscapedQuery := url.PathEscape("workspaceId=" + workspaceID + "&workspaceType=" + workspaceType)
 	if err := s.client.Get(ctx, fmt.Sprintf("/%s?%s", "public-keys", pathEscapedQuery), &publicKey); err != nil {
+
+		// Check to see if error response contains ssh-rsa
+		keyReturned := strings.Contains(fmt.Sprintf("%s", err), "ssh-rsa")
+		if keyReturned {
+			fmt.Printf("Response contains SSH Key")
+			// split string
+			parts := strings.SplitAfter(fmt.Sprintf("%s", err), "]")
+			fmt.Println(parts[0])
+			fmt.Println(parts[1])
+		}
+
+		// Extract response
 		return nil, fmt.Errorf("failed to get public key: %w", err)
 	}
 

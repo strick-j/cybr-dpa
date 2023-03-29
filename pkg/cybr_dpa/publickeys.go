@@ -61,7 +61,7 @@ func (s *Service) GetPublicKey(ctx context.Context, workspaceID, workspaceType s
 
 		return nil, fmt.Errorf("failed to get public key: %w", err)
 	}
-	//fmt.Println(&publicKey)
+	fmt.Println(publicKey)
 
 	return &publicKey, nil
 }

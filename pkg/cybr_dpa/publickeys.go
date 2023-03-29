@@ -7,10 +7,6 @@ import (
 	"strings"
 )
 
-type PublicKey interface {
-	String() string
-}
-
 type PublicKeyScript struct {
 	Base64Cmd string `json:"base64_cmd,omitempty"`
 }
@@ -28,7 +24,7 @@ type PubKeyError struct {
 }
 
 var (
-	publicKey       PublicKey
+	publicKey       string
 	publicKeyScript PublicKeyScript
 )
 
@@ -37,7 +33,7 @@ var (
 // Example Usage:
 //
 //	getPublicKey, err := s.GetPublicKey(context.Background, "cb5544d2-678e7-45f0-823e-555dc6f38ea6", "Azure")
-func (s *Service) GetPublicKey(ctx context.Context, workspaceID, workspaceType string) (*PublicKey, error) {
+func (s *Service) GetPublicKey(ctx context.Context, workspaceID, workspaceType string) (*string, error) {
 
 	allowedType := []string{"AWS", "Azure"}
 	if typeAllowed := contains(allowedType, workspaceType); !typeAllowed {
@@ -61,7 +57,7 @@ func (s *Service) GetPublicKey(ctx context.Context, workspaceID, workspaceType s
 
 		return nil, fmt.Errorf("failed to get public key: %w", err)
 	}
-	fmt.Println(publicKey)
+	fmt.Printf("Second Test: %s", publicKey)
 
 	return &publicKey, nil
 }

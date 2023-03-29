@@ -130,7 +130,6 @@ func (c *Client) newRequest(ctx context.Context, method, path string, payload in
 	if c.options.Verbose {
 		body, _ := httputil.DumpRequest(req, true)
 		log.Printf("%s", string(body))
-		//log.Println(fmt.Sprintf("%s", string(body)))
 	}
 
 	req = req.WithContext(ctx)
@@ -170,7 +169,6 @@ func (c *Client) do(r *http.Request) (*http.Response, error) {
 	if c.options.Verbose {
 		body, _ := httputil.DumpResponse(resp, true)
 		log.Printf("%s", string(body))
-		//log.Println(fmt.Sprintf("%s", string(body)))
 	}
 
 	switch resp.StatusCode {

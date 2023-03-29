@@ -53,9 +53,12 @@ type Policy struct {
 	UserAccessRules []struct {
 		RuleName string `json:"ruleName,omitempty"`
 		UserData struct {
-			Roles  []string `json:"roles,omitempty"`
-			Groups []any    `json:"groups,omitempty"`
-			Users  []any    `json:"users,omitempty"`
+			Roles []struct {
+				Name   string `json:"name,omitempty"`
+				Source string `json:"source,omitempty"`
+			} `json:"roles,omitempty"`
+			Groups []any `json:"groups,omitempty"`
+			Users  []any `json:"users,omitempty"`
 		} `json:"userData,omitempty"`
 		ConnectionInformation struct {
 			ConnectAs struct {

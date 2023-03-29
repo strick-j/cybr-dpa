@@ -27,9 +27,10 @@ func (s *Service) GetSettingsByFeature(ctx context.Context, featureName string) 
 // PutSettingsByFeature: Overrides all settings for the specified feature. Unspecified settings are restored to their default values.
 //
 //	settingsUpdate := types.FeatureConf {
-//		IsMfaCachingEnabled: true,
-//		KeyExpirationTimeSec: 900,
+//	  IsMfaCachingEnabled: true,
+//	  KeyExpirationTimeSec: 900,
 //	}
+//
 //	putSettingsByFeature, err := s.PutSettingsByFeature(context.Background, "MFA_CACHING", settingsUpdate)
 func (s *Service) PutSettingsByFeature(ctx context.Context, featureName string, featureConf types.FeatureConf) (*types.Settings, error) {
 	if err := s.client.Put(ctx, fmt.Sprintf("/%s/%s", "settings", featureName), featureConf, &Settings); err != nil {
@@ -42,9 +43,10 @@ func (s *Service) PutSettingsByFeature(ctx context.Context, featureName string, 
 // PatchSettingsByFeature: Overrides all settings for the specified feature. Unspecified settings are restored to their default values.
 //
 //	settingsUpdate := types.FeatureConf {
-//		IsMfaCachingEnabled: true,
-//		KeyExpirationTimeSec: 900,
+//	  IsMfaCachingEnabled: true,
+//	  KeyExpirationTimeSec: 900,
 //	}
+//
 //	patchSettingsByFeature, err := s.PatchSettingsByFeature(context.Background, "MFA_CACHING", settingsUpdate)
 func (s *Service) PatchSettingsByFeature(ctx context.Context, featureName string, featureConf types.FeatureConf) (*types.Settings, error) {
 	if err := s.client.Patch(ctx, fmt.Sprintf("/%s/%s", "settings", featureName), featureConf, &Settings); err != nil {

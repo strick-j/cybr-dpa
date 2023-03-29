@@ -3,12 +3,23 @@ package cybr_dpa
 import (
 	"context"
 	"fmt"
-
-	"github.com/strick-j/cybr-dpa/pkg/cybr_dpa/types"
 )
 
+type Settings struct {
+	FeatureName string      `json:"feature_name,omitempty"`
+	FeatureConf FeatureConf `json:"feature_conf,omitempty"`
+	Code        string      `json:"code,omitempty"`
+	Message     string      `json:"message,omitempty"`
+	Description string      `json:"description,omitempty"`
+}
+
+type FeatureConf struct {
+	IsMfaCachingEnabled  bool `json:"is_mfa_caching_enabled,omitempty"`
+	KeyExpirationTimeSec int  `json:"key_expiration_time_sec,omitempty"`
+}
+
 var (
-	Settings types.Settings
+	settings Settings
 )
 
 // GetSettingsByFeature: API for DPA service settings and configuration, including MFA caching. To run this API, you must have the DpaAdmin role.
@@ -16,12 +27,12 @@ var (
 // Example Usage:
 //
 //	getSettingsByFeature, err := s.GetSettingsByFeature(context.Background, "MFA_CACHING")
-func (s *Service) GetSettingsByFeature(ctx context.Context, featureName string) (*types.Settings, error) {
-	if err := s.client.Get(ctx, fmt.Sprintf("/%s/%s", "settings", featureName), &Settings); err != nil {
+func (s *Service) GetSettingsByFeature(ctx context.Context, featureName string) (*Settings, error) {
+	if err := s.client.Get(ctx, fmt.Sprintf("/%s/%s", "settings", featureName), &settings); err != nil {
 		return nil, fmt.Errorf("failed to get Connector Install Script: %w", err)
 	}
 
-	return &Settings, nil
+	return &settings, nil
 }
 
 // PutSettingsByFeature: Overrides all settings for the specified feature. Unspecified settings are restored to their default values.
@@ -32,12 +43,12 @@ func (s *Service) GetSettingsByFeature(ctx context.Context, featureName string) 
 //	}
 //
 //	putSettingsByFeature, err := s.PutSettingsByFeature(context.Background, "MFA_CACHING", settingsUpdate)
-func (s *Service) PutSettingsByFeature(ctx context.Context, featureName string, featureConf types.FeatureConf) (*types.Settings, error) {
-	if err := s.client.Put(ctx, fmt.Sprintf("/%s/%s", "settings", featureName), featureConf, &Settings); err != nil {
+func (s *Service) PutSettingsByFeature(ctx context.Context, featureName string, featureConf FeatureConf) (*Settings, error) {
+	if err := s.client.Put(ctx, fmt.Sprintf("/%s/%s", "settings", featureName), featureConf, &settings); err != nil {
 		return nil, fmt.Errorf("failed to get Connector Install Script: %w", err)
 	}
 
-	return &Settings, nil
+	return &settings, nil
 }
 
 // PatchSettingsByFeature: Overrides all settings for the specified feature. Unspecified settings are restored to their default values.
@@ -48,10 +59,10 @@ func (s *Service) PutSettingsByFeature(ctx context.Context, featureName string, 
 //	}
 //
 //	patchSettingsByFeature, err := s.PatchSettingsByFeature(context.Background, "MFA_CACHING", settingsUpdate)
-func (s *Service) PatchSettingsByFeature(ctx context.Context, featureName string, featureConf types.FeatureConf) (*types.Settings, error) {
-	if err := s.client.Patch(ctx, fmt.Sprintf("/%s/%s", "settings", featureName), featureConf, &Settings); err != nil {
+func (s *Service) PatchSettingsByFeature(ctx context.Context, featureName string, featureConf FeatureConf) (*Settings, error) {
+	if err := s.client.Patch(ctx, fmt.Sprintf("/%s/%s", "settings", featureName), featureConf, &settings); err != nil {
 		return nil, fmt.Errorf("failed to get Connector Install Script: %w", err)
 	}
 
-	return &Settings, nil
+	return &settings, nil
 }

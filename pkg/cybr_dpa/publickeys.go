@@ -40,10 +40,10 @@ func (s *Service) GetPublicKey(ctx context.Context, workspaceID, workspaceType s
 
 	allowedType := []string{"AWS", "Azure"}
 	if typeAllowed := contains(allowedType, workspaceType); !typeAllowed {
-		return nil, fmt.Errorf("connector type not allowed, valid types are AWS, AZURE, ON-PREMISE")
+		return nil, fmt.Errorf("connector type not allowed, valid types are AWS, Azure, ON-PREMISE")
 	}
 
-	pathEscapedQuery := url.PathEscape("workpaceId=" + workspaceID + "&workspaceType=" + workspaceType)
+	pathEscapedQuery := url.PathEscape("workspaceId=" + workspaceID + "&workspaceType=" + workspaceType)
 	if err := s.client.Get(ctx, fmt.Sprintf("/%s?%s", "public-keys", pathEscapedQuery), &publicKey); err != nil {
 		return nil, fmt.Errorf("failed to get public key: %w", err)
 	}
@@ -60,10 +60,10 @@ func (s *Service) GetPublicKeyScript(ctx context.Context, workspaceID, workspace
 
 	allowedType := []string{"AWS", "Azure"}
 	if typeAllowed := contains(allowedType, workspaceType); !typeAllowed {
-		return nil, fmt.Errorf("connector type not allowed, valid types are AWS, AZURE, ON-PREMISE")
+		return nil, fmt.Errorf("connector type not allowed, valid types are AWS, Azure, ON-PREMISE")
 	}
 
-	pathEscapedQuery := url.PathEscape("workpaceId=" + workspaceID + "&workspaceType=" + workspaceType)
+	pathEscapedQuery := url.PathEscape("workspaceId=" + workspaceID + "&workspaceType=" + workspaceType)
 	if err := s.client.Get(ctx, fmt.Sprintf("/%s/%s?%s", "public-keys", "scripts", pathEscapedQuery), &publicKeyScript); err != nil {
 		return nil, fmt.Errorf("failed to get public key: %w", err)
 	}

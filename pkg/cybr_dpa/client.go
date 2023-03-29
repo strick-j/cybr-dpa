@@ -157,9 +157,13 @@ func (c *Client) doRequest(r *http.Request, v interface{}) error {
 	var buf bytes.Buffer
 
 	if contentType == "text/plain" {
-		fmt.Printf("Testing: %s", io.TeeReader(resp.Body, &buf))
-		v = io.TeeReader(resp.Body, &buf)
-		//v = Make{buf.String()}
+		b, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("error parsing text/plain response: %w", err)
+		}
+
+		fmt.Printf("Testing: %s", string(b))
+		v = string(b)
 	}
 
 	if contentType == "application/json" {

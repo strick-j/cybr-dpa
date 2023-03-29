@@ -15,28 +15,8 @@ type jsontransport struct {
 	token string
 }
 
-type texttransport struct {
-	token string
-}
-
-func NewJsonService(clientURL string, clientApiEndpoint string, verbose bool, authToken *oauth2.Token) *Service {
+func NewService(clientURL string, clientApiEndpoint string, verbose bool, authToken *oauth2.Token) *Service {
 	t := jsontransport{
-		token: authToken.AccessToken,
-	}
-
-	return &Service{
-		client: NewClient(
-			&http.Client{Transport: &t},
-			Options{
-				ApiURL:  fmt.Sprintf("https://%s/%s", clientURL, clientApiEndpoint),
-				Verbose: verbose,
-			},
-		),
-	}
-}
-
-func NewTextService(clientURL string, clientApiEndpoint string, verbose bool, authToken *oauth2.Token) *Service {
-	t := texttransport{
 		token: authToken.AccessToken,
 	}
 
@@ -55,15 +35,6 @@ func (t *jsontransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	r := req.Clone(req.Context())
 	r.Header.Add("Content-Type", "application/json")
 	r.Header.Add("Accept", "application/json")
-	r.Header.Add("Authorization", "Bearer "+t.token)
-
-	return http.DefaultTransport.RoundTrip(r)
-}
-
-func (t *texttransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	r := req.Clone(req.Context())
-	r.Header.Add("Content-Type", "plain/text")
-	r.Header.Add("Accept", "plain/text")
 	r.Header.Add("Authorization", "Bearer "+t.token)
 
 	return http.DefaultTransport.RoundTrip(r)

@@ -158,7 +158,7 @@ func (c *Client) doRequest(r *http.Request, v interface{}) error {
 	dec := json.NewDecoder(io.TeeReader(resp.Body, &buf))
 
 	if contentType == "text/plain" {
-		v = fmt.Sprint(buf.String())
+		v = buf.String()
 	}
 
 	if contentType == "application/json" {

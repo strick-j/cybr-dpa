@@ -157,8 +157,9 @@ func (c *Client) doRequest(r *http.Request, v interface{}) error {
 	var buf bytes.Buffer
 
 	if contentType == "text/plain" {
-		fmt.Printf("Testing: %s", buf.String())
-		v = buf.String()
+		fmt.Printf("Testing: %s", io.TeeReader(resp.Body, &buf))
+		v = io.TeeReader(resp.Body, &buf)
+		//v = Make{buf.String()}
 	}
 
 	if contentType == "application/json" {

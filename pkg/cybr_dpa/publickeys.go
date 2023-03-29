@@ -43,17 +43,18 @@ func (s *Service) GetPublicKey(ctx context.Context, workspaceID, workspaceType s
 	pathEscapedQuery := url.PathEscape("workspaceId=" + workspaceID + "&workspaceType=" + workspaceType)
 	if err := s.client.Get(ctx, fmt.Sprintf("/%s?%s", "public-keys", pathEscapedQuery), &publicKey); err != nil {
 
-		// Check to see if error response contains ssh-rsa
+		// Check to see if error response contains ssh-rsa because response is text/plain and the http service/client
+		// is expecting JSON
 		keyReturned := strings.Contains(fmt.Sprintf("%s", err), "ssh-rsa")
 		if keyReturned {
-			fmt.Printf("Response contains SSH Key")
-			// split string
+			fmt.Printf("\nResponse contains SSH Key")
+			// Split and trim string using ] delimiter
 			parts := strings.SplitAfter(fmt.Sprintf("%s", err), "]")
-			fmt.Println(parts[0])
-			fmt.Println(parts[1])
+			extractedKey := strings.TrimSpace(parts[1])
+			fmt.Printf("\n%s", extractedKey)
+			return &extractedKey, nil
 		}
 
-		// Extract response
 		return nil, fmt.Errorf("failed to get public key: %w", err)
 	}
 

@@ -151,6 +151,8 @@ func (c *Client) doRequest(r *http.Request, v interface{}) error {
 		return nil
 	}
 
+	contentType := resp.Header.Get("Content-type")
+	fmt.Println("MIME: " + contentType)
 	var buf bytes.Buffer
 	mimeType := http.DetectContentType(buf.Bytes())
 	fmt.Println("MIME: " + mimeType)

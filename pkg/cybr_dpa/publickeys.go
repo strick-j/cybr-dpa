@@ -6,10 +6,6 @@ import (
 	"net/url"
 )
 
-type PublicKey struct {
-	PublicKey string `json:"publickey,omitempty"`
-}
-
 type PublicKeyScript struct {
 	Base64Cmd string `json:"base64_cmd,omitempty"`
 }
@@ -27,7 +23,7 @@ type PubKeyError struct {
 }
 
 var (
-	publicKey       PublicKey
+	publicKey       string
 	publicKeyScript PublicKeyScript
 )
 
@@ -36,7 +32,7 @@ var (
 // Example Usage:
 //
 //	getPublicKey, err := s.GetPublicKey(context.Background, "cb5544d2-678e7-45f0-823e-555dc6f38ea6", "Azure")
-func (s *Service) GetPublicKey(ctx context.Context, workspaceID, workspaceType string) (*PublicKey, error) {
+func (s *Service) GetPublicKey(ctx context.Context, workspaceID, workspaceType string) (*string, error) {
 
 	allowedType := []string{"AWS", "Azure"}
 	if typeAllowed := contains(allowedType, workspaceType); !typeAllowed {

@@ -33,11 +33,11 @@ var (
 // Example Usage:
 //
 //	getPublicKey, err := s.GetPublicKey(context.Background, "cb5544d2-678e7-45f0-823e-555dc6f38ea6", "Azure")
-func (s *Service) GetPublicKey(ctx context.Context, workspaceID, workspaceType string) (*string, error) {
+func (s *Service) GetPublicKey(ctx context.Context, workspaceID, workspaceType string) (string, error) {
 
 	allowedType := []string{"AWS", "Azure"}
 	if typeAllowed := contains(allowedType, workspaceType); !typeAllowed {
-		return nil, fmt.Errorf("connector type not allowed, valid types are AWS, Azure, ON-PREMISE")
+		return "", fmt.Errorf("connector type not allowed, valid types are AWS, Azure, ON-PREMISE")
 	}
 
 	pathEscapedQuery := url.PathEscape("workspaceId=" + workspaceID + "&workspaceType=" + workspaceType)
@@ -52,13 +52,13 @@ func (s *Service) GetPublicKey(ctx context.Context, workspaceID, workspaceType s
 			parts := strings.SplitAfter(fmt.Sprintf("%s", err), "]")
 			extractedKey := strings.TrimSpace(parts[1])
 			fmt.Printf("\n%s", extractedKey)
-			return &extractedKey, nil
+			return extractedKey, nil
 		}
 
-		return nil, fmt.Errorf("failed to get public key: %w", err)
+		return "", fmt.Errorf("failed to get public key: %w", err)
 	}
 
-	return &publicKey, nil
+	return publicKey, nil
 }
 
 // GetPublicKeyScript: Generates an SSH CA public key plus a deployment script for the specified workspace. Use this script to install the CyberArk certificate on target machines that don't have an existing certificate file.

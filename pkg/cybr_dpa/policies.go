@@ -38,11 +38,31 @@ func (s *Service) GetPolicyById(ctx context.Context, policyId string) (*types.Po
 	return &Policy, nil
 }
 
+// PostPolicy: Adds a new authorization policy
+//
+// Example Usage:
+//
+//	policyDetails := types.Policy {
+//	  PolicyName:  "ExamplePolicy",
+//	  Status:      "Enabled",
+//	  Description: "Example Policy",
+//	  ProvidersData.
+//	}
+//
+//	getPolicyById err := s.GetPolicyById(context.Background, policyDetails)
+func (s *Service) PostPolicy(ctx context.Context, newPolicy types.Policy) (*types.Policy, error) {
+	if err := s.client.Post(ctx, fmt.Sprintf("/%s", "access-policies"), newPolicy, &Policy); err != nil {
+		return nil, fmt.Errorf("failed to create new policy: %w", err)
+	}
+
+	return &Policy, nil
+}
+
 // DeletePolicyById: Deletes the specified policy
 //
 // Example Usage:
 //
-//	DeletePolicyById, err := s.DeletePolicyById(context.Background, "{policy_id}")
+//	err := s.DeletePolicyById(context.Background, "{policy_id}")
 func (s *Service) DeletePolicyById(ctx context.Context, policyId string) error {
 	if err := s.client.Delete(ctx, fmt.Sprintf("/%s/%s", "access-policies", policyId), nil); err != nil {
 		return fmt.Errorf("failed to delete policy %s: %w", policyId, err)

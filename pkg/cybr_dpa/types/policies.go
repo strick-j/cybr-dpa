@@ -1,5 +1,6 @@
 package types
 
+// Struct for the response from GET /api/access-policies
 type Policies struct {
 	Items []struct {
 		PolicyID    string   `json:"policyId"`
@@ -13,12 +14,13 @@ type Policies struct {
 	TotalCount int `json:"totalCount"`
 }
 
+// Struct for the response from GET, PATCH, PUT /api/access-policies/{policy-id} and POST /api/access-polcies
 type Policy struct {
 	PolicyName    string `json:"policyName,omitempty"`
 	Status        string `json:"status,omitempty"`
 	Description   string `json:"description,omitempty"`
 	ProvidersData struct {
-		Aws struct {
+		Aws *struct {
 			Regions []string `json:"regions,omitempty"`
 			Tags    []struct {
 				Key   string   `json:"Key,omitempty"`
@@ -27,7 +29,7 @@ type Policy struct {
 			VpcIds     []any `json:"vpcIds,omitempty"`
 			AccountIds []any `json:"accountIds,omitempty"`
 		} `json:"AWS,omitempty"`
-		Azure struct {
+		Azure *struct {
 			Regions []string `json:"regions,omitempty"`
 			Tags    []struct {
 				Key   string   `json:"Key,omitempty"`
@@ -37,7 +39,7 @@ type Policy struct {
 			VnetIds        []any `json:"vnetIds,omitempty"`
 			Subscriptions  []any `json:"subscriptions,omitempty"`
 		} `json:"Azure,omitempty"`
-		OnPrem struct {
+		OnPrem *struct {
 			FqdnRulesConjunction string `json:"fqdnRulesConjunction,omitempty"`
 			FqdnRules            []struct {
 				Operator            string `json:"operator,omitempty"`

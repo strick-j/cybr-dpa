@@ -7,6 +7,10 @@ import (
 	"strings"
 )
 
+type TextResponse struct {
+	Response string `json:"response,omitempty"`
+}
+
 type PublicKeyScript struct {
 	Base64Cmd string `json:"base64_cmd,omitempty"`
 }
@@ -24,7 +28,7 @@ type PubKeyError struct {
 }
 
 var (
-	publicKey       string
+	textResponse    TextResponse
 	publicKeyScript PublicKeyScript
 )
 
@@ -33,7 +37,7 @@ var (
 // Example Usage:
 //
 //	getPublicKey, err := s.GetPublicKey(context.Background, "cb5544d2-678e7-45f0-823e-555dc6f38ea6", "Azure")
-func (s *Service) GetPublicKey(ctx context.Context, workspaceID, workspaceType string) (*string, error) {
+func (s *Service) GetPublicKey(ctx context.Context, workspaceID, workspaceType string) (*TextResponse, error) {
 
 	allowedType := []string{"AWS", "Azure"}
 	if typeAllowed := contains(allowedType, workspaceType); !typeAllowed {
@@ -41,7 +45,7 @@ func (s *Service) GetPublicKey(ctx context.Context, workspaceID, workspaceType s
 	}
 
 	pathEscapedQuery := url.PathEscape("workspaceId=" + workspaceID + "&workspaceType=" + workspaceType)
-	if err := s.client.Get(ctx, fmt.Sprintf("/%s?%s", "public-keys", pathEscapedQuery), &publicKey); err != nil {
+	if err := s.client.Get(ctx, fmt.Sprintf("/%s?%s", "public-keys", pathEscapedQuery), &textResponse); err != nil {
 
 		// Check to see if error response contains ssh-rsa because response is text/plain and the http service/client
 		// is expecting JSON
@@ -57,9 +61,8 @@ func (s *Service) GetPublicKey(ctx context.Context, workspaceID, workspaceType s
 
 		return nil, fmt.Errorf("failed to get public key: %w", err)
 	}
-	fmt.Printf("Second Test: %s", publicKey)
 
-	return &publicKey, nil
+	return &textResponse, nil
 }
 
 // GetPublicKeyScript: Generates an SSH CA public key plus a deployment script for the specified workspace. Use this script to install the CyberArk certificate on target machines that don't have an existing certificate file.

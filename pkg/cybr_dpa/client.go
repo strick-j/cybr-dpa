@@ -157,17 +157,16 @@ func (c *Client) doRequest(r *http.Request, v interface{}) error {
 	var buf bytes.Buffer
 
 	if contentType == "text/plain" {
-
-		if err := json.Unmarshal(buf.Bytes(), v); err != nil {
-			return fmt.Errorf("could not unmarshal text/plain response: %w", err)
+		b, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("error parsing text/plain response: %w", err)
 		}
-		//b, err := io.ReadAll(resp.Body)
-		//if err != nil {
-		//	return fmt.Errorf("error parsing text/plain response: %w", err)
-		//}
 
-		//fmt.Printf("Testing: %s", string(b))
-		//v = string(b)
+		textResponse := TextResponse{
+			Response: string(b),
+		}
+		fmt.Printf("Testing: %s", string(b))
+		v = textResponse
 	}
 
 	if contentType == "application/json" {

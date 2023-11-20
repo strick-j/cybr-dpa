@@ -1,4 +1,4 @@
-package cybr_dpa
+package dpa
 
 import (
 	"context"

@@ -1,4 +1,4 @@
-package cybr_dpa
+package dpa
 
 import (
 	"bytes"
@@ -35,16 +35,16 @@ func NewClient(httpClient *http.Client, options Options) *Client {
 	}
 }
 
+// Basic Interface Definitions
 type HTTPClient interface {
 	Get(ctx context.Context, path string, v interface{}) error
 	Post(ctx context.Context, path string, payload interface{}, v interface{}) error
 	Put(ctx context.Context, path string, payload interface{}, v interface{}) error
 	Patch(ctx context.Context, path string, payload interface{}, v interface{}) error
-	Delete(ctx context.Context, path string, v interface{}) error
+	Delete(ctx context.Context, path string, payload interface{}, v interface{}) error
 }
 
-////////////// COMMON METHODS - GET, POST, PUT, DELETE ///////////////////////////////////////////////
-
+// //////////// COMMON METHODS - GET, POST, PUT, PATCH,  DELETE ///////////////////////////////////////////////
 func (c *Client) Get(ctx context.Context, path string, v interface{}) error {
 	req, err := c.newRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
@@ -97,8 +97,8 @@ func (c *Client) Patch(ctx context.Context, path string, payload interface{}, v 
 	return nil
 }
 
-func (c *Client) Delete(ctx context.Context, path string, v interface{}) error {
-	req, err := c.newRequest(ctx, http.MethodDelete, path, nil)
+func (c *Client) Delete(ctx context.Context, path string, payload interface{}, v interface{}) error {
+	req, err := c.newRequest(ctx, http.MethodDelete, path, payload)
 	if err != nil {
 		return fmt.Errorf("failed to create DELETE request: %w", err)
 	}
@@ -129,7 +129,7 @@ func (c *Client) newRequest(ctx context.Context, method, path string, payload in
 
 	if c.options.Verbose {
 		body, _ := httputil.DumpRequest(req, true)
-		log.Printf("%s", string(body))
+		log.Println(string(body))
 	}
 
 	req = req.WithContext(ctx)
@@ -147,35 +147,23 @@ func (c *Client) doRequest(r *http.Request, v interface{}) error {
 	}
 	defer resp.Body.Close()
 
-	if v == nil {
+	switch v := v.(type) {
+	case nil:
 		return nil
-	}
-
-	contentType := resp.Header.Get("Content-type")
-	fmt.Println("\n\nMIME: " + contentType)
-
-	var buf bytes.Buffer
-
-	if contentType == "text/plain" {
+	case *string:
 		b, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return fmt.Errorf("error parsing text/plain response: %w", err)
+			return fmt.Errorf("could not read response body: %w [%s:%s]", err, r.Method, r.URL.String())
 		}
-
-		textResponse := TextResponse{
-			Response: string(b),
-		}
-		fmt.Printf("Testing: %s", string(b))
-		v = textResponse
-	}
-
-	if contentType == "application/json" {
+		*v = string(b)
+		return nil
+	default:
+		var buf bytes.Buffer
 		dec := json.NewDecoder(io.TeeReader(resp.Body, &buf))
 		if err := dec.Decode(v); err != nil {
 			return fmt.Errorf("could not parse response body: %w [%s:%s] %s", err, r.Method, r.URL.String(), buf.String())
 		}
 	}
-
 	return nil
 }
 
@@ -187,12 +175,13 @@ func (c *Client) do(r *http.Request) (*http.Response, error) {
 
 	if c.options.Verbose {
 		body, _ := httputil.DumpResponse(resp, true)
-		log.Printf("%s", string(body))
+		log.Println(string(body))
 	}
 
 	switch resp.StatusCode {
 	case http.StatusOK,
 		http.StatusCreated,
+		http.StatusMultiStatus,
 		http.StatusNoContent:
 		return resp, nil
 	}

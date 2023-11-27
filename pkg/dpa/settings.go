@@ -72,17 +72,12 @@ func (s *Service) ListSettingsFeature(ctx context.Context, f string) (*types.Fea
 // Example:
 //
 //		// Create Body for UpdateSettings Request
-//	 	newMfaCachingSettings := struct {
+//	 	updateSettingsRequest := struct {
 //			IsMfaCachingEnabled  bool `json:"isMfaCachingEnabled,omitempty"`
 //			KeyExpirationTimeSec int  `json:"keyExpirationTimeSec,omitempty"`
 //		}{
 //			true,
 //			3600
-//		}
-//		updateSettingsRequest := struct {
-//			MfaCaching   struct `json:"mfaCaching,omitempty"`
-//		}{
-//			MfaCaching	newMfaCachingSettings
 //		}
 //
 //		// Update settings using created struct

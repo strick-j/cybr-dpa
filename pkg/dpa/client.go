@@ -197,6 +197,7 @@ func (c *Client) do(r *http.Request) (*http.Response, bool, error) {
 		http.StatusNoContent:
 		return resp, true, nil
 	case http.StatusBadRequest,
+		http.StatusUnauthorized,
 		http.StatusInternalServerError:
 		return resp, false, nil
 	}
@@ -206,8 +207,7 @@ func (c *Client) do(r *http.Request) (*http.Response, bool, error) {
 	switch resp.StatusCode {
 	case http.StatusNotFound:
 		return nil, false, ErrNotFound
-	case http.StatusUnauthorized,
-		http.StatusForbidden:
+	case http.StatusForbidden:
 		return nil, false, ErrUserAccessDenied
 	case http.StatusTooManyRequests:
 		return nil, false, ErrTooManyRequests

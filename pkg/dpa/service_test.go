@@ -1,7 +1,6 @@
 package dpa
 
 import (
-	"log"
 	"testing"
 	"time"
 
@@ -18,12 +17,10 @@ func TestNewServiceValidToken(t *testing.T) {
 		Expiry:      time.Now().Add(5 * time.Hour),
 	}
 
-	s, err := NewService(clientUrl, clientApiEndpoint, verbose, token)
+	_, err := NewService(clientUrl, clientApiEndpoint, verbose, token)
 	if err != nil {
 		t.Errorf("got invalid with valid options; want valid: %s", err)
 	}
-
-	log.Printf("%s", s.client.httpClient.Transport)
 }
 
 func TestNewServiceExpiredToken(t *testing.T) {

@@ -39,6 +39,31 @@ func TestListSettings_BadRequest(t *testing.T) {
 	}
 }
 
+func TestListSettings_Timeout(t *testing.T) {
+	// Mock Response
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(11 * time.Second)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"code":"DPA_INVALID_VALUE","message":"error message","description":"error description"}`))
+	}))
+	defer ts.Close()
+
+	// Valid Token
+	token := &oauth2.Token{
+		AccessToken: "123",
+		TokenType:   "bearer",
+		Expiry:      time.Now().Add(5 * time.Hour),
+	}
+	// Valid Service using httptest New Server URL
+	ns, _ := NewService(ts.URL, "api", false, token)
+
+	_, _, err := ns.ListSettings(context.Background())
+	if err == nil {
+		t.Errorf("ListSettings() got no error = %v, wantErr", err)
+	}
+}
+
 func TestListSettings(t *testing.T) {
 	want := 3600
 	// Mock Response
@@ -72,6 +97,7 @@ func TestListSettingsFeature(t *testing.T) {
 		name     string
 		input    string
 		header   http.ConnState
+		sleep    time.Duration
 		response string
 		wantErr  bool
 	}{
@@ -80,6 +106,7 @@ func TestListSettingsFeature(t *testing.T) {
 			input:    "mfacaching",
 			header:   http.StatusBadRequest,
 			response: `{"code":"400","message":"Bad Request","description":"value is not a valid enumeration member; permitted: 'MFA_CACHING', 'STANDING_ACCESS', 'SSH_COMMAND_AUDIT', 'RDP_FILE_TRANSFER', 'CERTIFICATE_VALIDATION' (field: featureName)"}`,
+			sleep:    1 * time.Millisecond,
 			wantErr:  false,
 		},
 		{
@@ -87,6 +114,7 @@ func TestListSettingsFeature(t *testing.T) {
 			input:    "MFA_CACHING",
 			header:   http.StatusOK,
 			response: `{"feature_name":"MFA_CACHING","feature_conf":{"is_mfa_caching_enabled":true,"key_expiration_time_sec":3600}}`,
+			sleep:    1 * time.Millisecond,
 			wantErr:  false,
 		},
 		{
@@ -94,7 +122,16 @@ func TestListSettingsFeature(t *testing.T) {
 			input:    "MFA_CACHING",
 			header:   http.StatusUnauthorized,
 			response: `{"code":"DPA_AUTHENTICATION_TOKEN_VALIDATION_FAILED","message":"Authentication failed. If the issue persists, please contact your system administrator.","description":"Authentication token validation failed"}`,
+			sleep:    1 * time.Millisecond,
 			wantErr:  false,
+		},
+		{
+			name:     "Timeout",
+			input:    "MFA_CACHING",
+			header:   http.StatusOK,
+			response: `{"feature_name":"MFA_CACHING","feature_conf":{"is_mfa_caching_enabled":true,"key_expiration_time_sec":3600}}`,
+			sleep:    11 * time.Second,
+			wantErr:  true,
 		},
 	}
 
@@ -102,6 +139,7 @@ func TestListSettingsFeature(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Mock Response
 			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				time.Sleep(tt.sleep)
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(int(tt.header))
 				w.Write([]byte(tt.response))
@@ -120,11 +158,11 @@ func TestListSettingsFeature(t *testing.T) {
 			_, _, err := ns.ListSettingsFeature(context.Background(), tt.input)
 			if tt.wantErr {
 				if err == nil {
-					t.Errorf("GenerateScript() error = %v, wantErr %v", err, tt.wantErr)
+					t.Errorf("ListSettingsFeature() error = %v, wantErr %v", err, tt.wantErr)
 				}
 			} else {
 				if err != nil {
-					t.Errorf("GenerateScript() error = %v, wantErr %v", err, tt.wantErr)
+					t.Errorf("ListSettingsFeature() error = %v, wantErr %v", err, tt.wantErr)
 				}
 			}
 		})
@@ -137,12 +175,28 @@ func TestUpdateSettings(t *testing.T) {
 		input    interface{}
 		response string
 		header   http.ConnState
+		sleep    time.Duration
 		wantErr  bool
 	}{
 		{
 			name:    "Invalid input type",
 			input:   "String is not a valid input type",
+			sleep:   1 * time.Millisecond,
 			wantErr: true,
+		},
+		{
+			name: "Timeout",
+			input: struct {
+				isMfaCachingEnabled  bool
+				keyExpirationTimeSec int
+			}{
+				isMfaCachingEnabled:  true,
+				keyExpirationTimeSec: 3600,
+			},
+			sleep:    11 * time.Second,
+			header:   http.StatusOK,
+			response: `{"feature_name":"MFA_CACHING","feature_conf":{"is_mfa_caching_enabled":true,"key_expiration_time_sec":3600}}`,
+			wantErr:  true,
 		},
 		{
 			name: "Valid Input",
@@ -154,6 +208,7 @@ func TestUpdateSettings(t *testing.T) {
 				keyExpirationTimeSec: 3600,
 			},
 			header:   http.StatusOK,
+			sleep:    1 * time.Millisecond,
 			response: `{"feature_name":"MFA_CACHING","feature_conf":{"is_mfa_caching_enabled":true,"key_expiration_time_sec":3600}}`,
 			wantErr:  false,
 		},
@@ -165,6 +220,7 @@ func TestUpdateSettings(t *testing.T) {
 					KeyExpirationTimeSec: 3600,
 				},
 			},
+			sleep:    1 * time.Millisecond,
 			header:   http.StatusBadRequest,
 			response: `{"code":"400","message":"Bad Request","description":"extra fields not permitted (field: mfaCachingConfiguration)"}`,
 			wantErr:  false,
@@ -175,6 +231,7 @@ func TestUpdateSettings(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Mock Response
 			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				time.Sleep(tt.sleep)
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(int(tt.header))
 				w.Write([]byte(tt.response))
@@ -193,11 +250,11 @@ func TestUpdateSettings(t *testing.T) {
 			_, _, err := ns.UpdateSettings(context.Background(), tt.input)
 			if tt.wantErr {
 				if err == nil {
-					t.Errorf("GenerateScript() error = %v, wantErr %v", err, tt.wantErr)
+					t.Errorf("UpdateSettings() error = %v, wantErr %v", err, tt.wantErr)
 				}
 			} else {
 				if err != nil {
-					t.Errorf("GenerateScript() error = %v, wantErr %v", err, tt.wantErr)
+					t.Errorf("UpdateSettings() error = %v, wantErr %v", err, tt.wantErr)
 				}
 			}
 		})

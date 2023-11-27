@@ -18,18 +18,25 @@ var (
 // GetPublicKey returns the public key for the DPA Workspace
 // Expects an ordered map of the query parameters
 // Returns a PublicKey or error if failed
-func (s *Service) GetPublicKey(ctx context.Context, query map[string]string) (*types.PublicKey, *types.ErrorResponse, error) {
-	ctx, cancelCtx := context.WithTimeout(ctx, 10000*time.Millisecond)
+func (s *Service) GetPublicKey(ctx context.Context, query interface{}) (*types.PublicKey, *types.ErrorResponse, error) {
+	ctx, cancelCtx := context.WithTimeout(ctx, 5*time.Second)
+
+	// Check to see if query was passed as map[string]string
+	v, ok := query.(map[string]string)
+	if !ok {
+		defer cancelCtx()
+		return nil, nil, fmt.Errorf("getPublicKey: Please pass query parameters via map[string]string")
+	}
 
 	// Validate both query parameters were provided. If not, return error
-	if len(query) < 2 {
+	if len(v) != 2 {
 		defer cancelCtx()
 		return nil, nil, fmt.Errorf("getPublicKey: Missing required parameters")
 	}
 
 	// Parse query parameters
 	q := url.Values{}
-	for a, b := range query {
+	for a, b := range v {
 		q.Add(a, b)
 	}
 
@@ -47,18 +54,25 @@ func (s *Service) GetPublicKey(ctx context.Context, query map[string]string) (*t
 // GetPublicKeyScript returns the public key setup script
 // Expects an ordered map of the query parameters
 // Returns a PublicKey struct or error if failed
-func (s *Service) GetPublicKeyScript(ctx context.Context, query map[string]string) (*types.PublicKeyScript, *types.ErrorResponse, error) {
-	ctx, cancelCtx := context.WithTimeout(ctx, 10000*time.Millisecond)
+func (s *Service) GetPublicKeyScript(ctx context.Context, query interface{}) (*types.PublicKeyScript, *types.ErrorResponse, error) {
+	ctx, cancelCtx := context.WithTimeout(ctx, 5*time.Second)
+
+	// Check to see if query was passed as map[string]string
+	v, ok := query.(map[string]string)
+	if !ok {
+		defer cancelCtx()
+		return nil, nil, fmt.Errorf("getPublicKey: Please pass query parameters via map[string]string")
+	}
 
 	// Validate query parameters were provided. If not, return error
-	if len(query) < 2 {
+	if len(v) != 2 {
 		defer cancelCtx()
 		return nil, nil, fmt.Errorf("getPublicKeyScript: Missing required parameters")
 	}
 
 	// Parse query parameters
 	q := url.Values{}
-	for a, b := range query {
+	for a, b := range v {
 		q.Add(a, b)
 	}
 

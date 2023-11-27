@@ -1,8 +1,16 @@
 package types
 
 // error response
-type Error struct {
-	Code        string `json:"code"`
-	Message     string `json:"message"`
-	Description string `json:"description"`
+type ErrorResponse struct {
+	Code        string                `json:"code,omitempty"`
+	Message     string                `json:"message,omitempty"`
+	Description string                `json:"description,omitempty"`
+	Errors      []NestedErrorResponse `json:"errors,omitempty"`
+}
+
+type NestedErrorResponse struct {
+	Code        string `json:"code,omitempty"`
+	Message     string `json:"message,omitempty"`
+	Description string `json:"description,omitempty"`
+	Field       string `json:"field,omitempty"`
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"reflect"
-	"strings"
 	"time"
 
 	"github.com/strick-j/cybr-dpa/pkg/dpa/types"
@@ -15,8 +14,17 @@ var (
 	featureSetting types.FeatureSetting
 )
 
-// ListSettings retrieves the settings for the DPA instance
-// Returns a Settings struct or error if failed
+// ListSettings provides all settings as a response.
+// Returns a types.Settings response or types.ErrorResponse based on the
+// response from the API. An error is returned on request failure
+// Example:
+//
+//	// List Settings
+//	resp, errResp, err := s.ListSettings(context.Background())
+//	if err != nil {
+//		log.Fatalf("Failed to retrieve settings. %s", err)
+//		return
+//	}
 func (s *Service) ListSettings(ctx context.Context) (*types.Settings, *types.ErrorResponse, error) {
 	// Set a timeout for the request
 	ctx, cancelCtx := context.WithTimeout(ctx, 10000*time.Millisecond)
@@ -30,20 +38,22 @@ func (s *Service) ListSettings(ctx context.Context) (*types.Settings, *types.Err
 	return &settings, &errorResponse, nil
 }
 
+// ListSettingsFeature provides a specific setting reponse.
+// Valid input strings are:
+// 'MFA_CACHING', 'STANDING_ACCESS', 'SSH_COMMAND_AUDIT', 'RDP_FILE_TRANSFER', 'CERTIFICATE_VALIDATION'
+// Returns a types.Settings response or types.ErrorResponse based on the
+// response from the API. An error is returned on request failure
+// Example:
+//
+//	// List Settings Feature
+//	resp, errResp, err := s.ListSettingsFeature(context.Background(), "MFA_CACHING")
+//	if err != nil {
+//		log.Fatalf("Failed to retrieve setting. %s", err)
+//		return
+//	}
 func (s *Service) ListSettingsFeature(ctx context.Context, f string) (*types.FeatureSetting, *types.ErrorResponse, error) {
 	// Set a timeout for the request
 	ctx, cancelCtx := context.WithTimeout(ctx, 10000*time.Millisecond)
-
-	// Validate provided feature name
-	if strings.ToLower(f) == "mfacaching" {
-		f = "mfaCaching"
-	} else if strings.ToLower(f) == "sshcommandaudit" {
-		f = "sshCommandAudit"
-	} else {
-		err := fmt.Errorf("getSettings: Invalid Feature provided %s. Valid options are mfaCaching and sshCommandAudit", f)
-		defer cancelCtx()
-		return nil, nil, err
-	}
 
 	// Make request for specific setting via service client
 	if err := s.client.Get(ctx, fmt.Sprintf("%s/%s", "/settings", f), &featureSetting, &errorResponse); err != nil {
@@ -57,6 +67,30 @@ func (s *Service) ListSettingsFeature(ctx context.Context, f string) (*types.Fea
 
 // UpdateSettings updates the settings for the DPA instance
 // Expects a struct of type types.Settings
+// Returns a types.Settings response or types.ErrorResponse based on the
+// response from the API. An error is returned on request failure
+// Example:
+//
+//		// Create Body for UpdateSettings Request
+//	 	newMfaCachingSettings := struct {
+//			IsMfaCachingEnabled  bool `json:"isMfaCachingEnabled,omitempty"`
+//			KeyExpirationTimeSec int  `json:"keyExpirationTimeSec,omitempty"`
+//		}{
+//			true,
+//			3600
+//		}
+//		updateSettingsRequest := struct {
+//			MfaCaching   struct `json:"mfaCaching,omitempty"`
+//		}{
+//			MfaCaching	newMfaCachingSettings
+//		}
+//
+//		// Update settings using created struct
+//		resp, errResp, err := s.UpdateSettings(context.Background(), updateSettingsRequest)
+//		if err != nil {
+//			log.Fatalf("Failed to update settings. %s", err)
+//			return
+//		}
 func (s *Service) UpdateSettings(ctx context.Context, p interface{}) (*types.Settings, *types.ErrorResponse, error) {
 	// Set a timeout for the request
 	ctx, cancelCtx := context.WithTimeout(ctx, 10000*time.Millisecond)

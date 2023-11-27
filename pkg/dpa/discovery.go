@@ -3,7 +3,6 @@ package dpa
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/url"
 	"time"
 
@@ -18,21 +17,33 @@ var (
 
 // ListTargetSets returns a list of target sets
 // Query parameters can be used to filter the results and are optional
-func (s *Service) ListTargetSets(ctx context.Context, query map[string]string) (*types.ListTargetSetResponse, *types.ErrorResponse, error) {
+func (s *Service) ListTargetSets(ctx context.Context, query interface{}) (*types.ListTargetSetResponse, *types.ErrorResponse, error) {
 	// Set a timeout for the request
-	ctx, cancelCtx := context.WithTimeout(ctx, 10000*time.Millisecond)
+	ctx, cancelCtx := context.WithTimeout(ctx, 5*time.Second)
 
-	// Parse query parameters
-	q := url.Values{}
-	for a, b := range query {
-		if len(b) != 0 {
-			q.Add(a, b)
+	var path string
+
+	if query != nil {
+		// Check to see if query was passed as map[string]string
+		v, ok := query.(map[string]string)
+		if !ok {
+			defer cancelCtx()
+			return nil, nil, fmt.Errorf("getPublicKey: Please pass query parameters via map[string]string")
 		}
+
+		// Parse query parameters
+		q := url.Values{}
+		for a, b := range v {
+			if len(b) != 0 {
+				q.Add(a, b)
+			}
+		}
+		// Create path using query paramters and make request via service client
+		path = fmt.Sprintf("/discovery/targetsets?%s", q.Encode())
+	} else if query == nil {
+		path = "/discovery/targetsets"
 	}
 
-	// Create path using query paramters and make request via service client
-	path := fmt.Sprintf("/discovery/targetsets?%s", q.Encode())
-	log.Printf("path: %s", path)
 	if err := s.client.Get(ctx, path, &listTargetSetResponse, &errorResponse); err != nil {
 		defer cancelCtx()
 		return nil, nil, fmt.Errorf("getTargetSet: Failed to retrieve Target Sets. %s", err)
@@ -47,7 +58,7 @@ func (s *Service) ListTargetSets(ctx context.Context, query map[string]string) (
 // Struct is defined in pkg/cybr/dpa/types/dicovery.go as TargetSetMapping
 func (s *Service) AddTargetSet(ctx context.Context, p interface{}) (*types.AddTargetSetResponse, *types.ErrorResponse, error) {
 	// Set a timeout for the request
-	ctx, cancelCtx := context.WithTimeout(ctx, 10000*time.Millisecond)
+	ctx, cancelCtx := context.WithTimeout(ctx, 5*time.Second)
 
 	// Make request to add policy via service client
 	if err := s.client.Post(ctx, "/discovery/targetsets", p, &addTargetSetResponse, &errorResponse); err != nil {
@@ -64,7 +75,7 @@ func (s *Service) AddTargetSet(ctx context.Context, p interface{}) (*types.AddTa
 // e.g. ["targetset1", "targetset2"]
 func (s *Service) DeleteTargetSet(ctx context.Context, n []string) (*types.DeleteTargetSetResponse, *types.ErrorResponse, error) {
 	// Set a timeout for the request
-	ctx, cancelCtx := context.WithTimeout(ctx, 10000*time.Millisecond)
+	ctx, cancelCtx := context.WithTimeout(ctx, 5*time.Second)
 
 	// Check if target set name(s) are empty
 	if len(n) < 1 {

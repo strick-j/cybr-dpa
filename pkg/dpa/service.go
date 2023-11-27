@@ -11,31 +11,33 @@ type Service struct {
 	client *Client
 }
 
-type transport struct {
-	token string
-}
+func NewService(clientURL, clientApiEndpoint string, verbose bool, authToken *oauth2.Token) (*Service, error) {
+	// Validate Bearer Token was provided
+	tokenType := authToken.Type()
+	if tokenType != "Bearer" {
+		return nil, fmt.Errorf("dpa: invalid token type provided %s, expected type is bearer token", tokenType)
+	}
 
-func NewService(clientURL, clientApiEndpoint string, verbose bool, authToken *oauth2.Token) *Service {
-	t := transport{
-		token: authToken.AccessToken,
+	// Validate Bearer Token is still valid
+	if !authToken.Valid() {
+		return nil, fmt.Errorf("dpa: token is invalid")
+	}
+
+	tr := &Transport{
+		Source: oauth2.StaticTokenSource(&oauth2.Token{
+			AccessToken: authToken.AccessToken,
+			TokenType:   authToken.TokenType,
+			Expiry:      authToken.Expiry,
+		}),
 	}
 
 	return &Service{
 		client: NewClient(
-			&http.Client{Transport: &t},
+			&http.Client{Transport: tr},
 			Options{
 				ApiURL:  fmt.Sprintf("%s/%s", clientURL, clientApiEndpoint),
 				Verbose: verbose,
 			},
 		),
-	}
-}
-
-func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
-	r := req.Clone(req.Context())
-	r.Header.Add("Content-Type", "application/json")
-	r.Header.Add("Accept", "application/json")
-	r.Header.Add("Authorization", "Bearer "+t.token)
-
-	return http.DefaultTransport.RoundTrip(r)
+	}, nil
 }

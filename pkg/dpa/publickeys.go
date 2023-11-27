@@ -18,13 +18,13 @@ var (
 // GetPublicKey returns the public key for the DPA Workspace
 // Expects an ordered map of the query parameters
 // Returns a PublicKey or error if failed
-func (s *Service) GetPublicKey(ctx context.Context, query map[string]string) (*types.PublicKey, error) {
+func (s *Service) GetPublicKey(ctx context.Context, query map[string]string) (*types.PublicKey, *types.ErrorResponse, error) {
 	ctx, cancelCtx := context.WithTimeout(ctx, 10000*time.Millisecond)
 
 	// Validate both query parameters were provided. If not, return error
 	if len(query) < 2 {
 		defer cancelCtx()
-		return nil, fmt.Errorf("getPublicKey: Missing required parameters")
+		return nil, nil, fmt.Errorf("getPublicKey: Missing required parameters")
 	}
 
 	// Parse query parameters
@@ -35,25 +35,25 @@ func (s *Service) GetPublicKey(ctx context.Context, query map[string]string) (*t
 
 	// Create URL and make request via service client
 	path := fmt.Sprintf("/public-keys?%s", q.Encode())
-	if err := s.client.Get(ctx, path, &publicKey); err != nil {
+	if err := s.client.Get(ctx, path, &publicKey, &errorResponse); err != nil {
 		defer cancelCtx()
-		return nil, fmt.Errorf("getPublicKey: Failed to retrieve public key. %s", err)
+		return nil, nil, fmt.Errorf("getPublicKey: Failed to retrieve public key. %s", err)
 	}
 
 	defer cancelCtx()
-	return &types.PublicKey{PublicKey: publicKey}, nil
+	return &types.PublicKey{PublicKey: publicKey}, &errorResponse, nil
 }
 
 // GetPublicKeyScript returns the public key setup script
 // Expects an ordered map of the query parameters
 // Returns a PublicKey struct or error if failed
-func (s *Service) GetPublicKeyScript(ctx context.Context, query map[string]string) (*types.PublicKeyScript, error) {
+func (s *Service) GetPublicKeyScript(ctx context.Context, query map[string]string) (*types.PublicKeyScript, *types.ErrorResponse, error) {
 	ctx, cancelCtx := context.WithTimeout(ctx, 10000*time.Millisecond)
 
 	// Validate query parameters were provided. If not, return error
 	if len(query) < 2 {
 		defer cancelCtx()
-		return nil, fmt.Errorf("getPublicKeyScript: Missing required parameters")
+		return nil, nil, fmt.Errorf("getPublicKeyScript: Missing required parameters")
 	}
 
 	// Parse query parameters
@@ -64,11 +64,11 @@ func (s *Service) GetPublicKeyScript(ctx context.Context, query map[string]strin
 
 	// Create path and make request via service client
 	path := fmt.Sprintf("/public-keys/scripts?%s", q.Encode())
-	if err := s.client.Get(ctx, path, &publicKeyScript); err != nil {
+	if err := s.client.Get(ctx, path, &publicKeyScript, &errorResponse); err != nil {
 		defer cancelCtx()
-		return nil, fmt.Errorf("getPublicKeyScript: Failed to retrieve public key installation script. %s", err)
+		return nil, nil, fmt.Errorf("getPublicKeyScript: Failed to retrieve public key installation script. %s", err)
 	}
 
 	defer cancelCtx()
-	return &publicKeyScript, nil
+	return &publicKeyScript, &errorResponse, nil
 }

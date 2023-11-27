@@ -17,20 +17,20 @@ var (
 
 // ListSettings retrieves the settings for the DPA instance
 // Returns a Settings struct or error if failed
-func (s *Service) ListSettings(ctx context.Context) (*types.Settings, error) {
+func (s *Service) ListSettings(ctx context.Context) (*types.Settings, *types.ErrorResponse, error) {
 	// Set a timeout for the request
 	ctx, cancelCtx := context.WithTimeout(ctx, 10000*time.Millisecond)
 
 	// Make request for settings via service client
-	if err := s.client.Get(ctx, "/settings", &settings); err != nil {
+	if err := s.client.Get(ctx, "/settings", &settings, &errorResponse); err != nil {
 		defer cancelCtx()
-		return nil, fmt.Errorf("getSettings: Failed to retrieve settings. %s", err)
+		return nil, nil, fmt.Errorf("getSettings: Failed to retrieve settings. %s", err)
 	}
 	defer cancelCtx()
-	return &settings, nil
+	return &settings, &errorResponse, nil
 }
 
-func (s *Service) ListSettingsFeature(ctx context.Context, f string) (*types.FeatureSetting, error) {
+func (s *Service) ListSettingsFeature(ctx context.Context, f string) (*types.FeatureSetting, *types.ErrorResponse, error) {
 	// Set a timeout for the request
 	ctx, cancelCtx := context.WithTimeout(ctx, 10000*time.Millisecond)
 
@@ -42,22 +42,22 @@ func (s *Service) ListSettingsFeature(ctx context.Context, f string) (*types.Fea
 	} else {
 		err := fmt.Errorf("getSettings: Invalid Feature provided %s. Valid options are mfaCaching and sshCommandAudit", f)
 		defer cancelCtx()
-		return nil, err
+		return nil, nil, err
 	}
 
 	// Make request for specific setting via service client
-	if err := s.client.Get(ctx, fmt.Sprintf("%s/%s", "/settings", f), &featureSetting); err != nil {
+	if err := s.client.Get(ctx, fmt.Sprintf("%s/%s", "/settings", f), &featureSetting, &errorResponse); err != nil {
 		defer cancelCtx()
-		return nil, fmt.Errorf("getSettings: Failed to retrieve settings. %s", err)
+		return nil, nil, fmt.Errorf("getSettings: Failed to retrieve settings. %s", err)
 	}
 
 	defer cancelCtx()
-	return &featureSetting, nil
+	return &featureSetting, &errorResponse, nil
 }
 
 // UpdateSettings updates the settings for the DPA instance
 // Expects a struct of type types.Settings
-func (s *Service) UpdateSettings(ctx context.Context, p interface{}) (*types.Settings, error) {
+func (s *Service) UpdateSettings(ctx context.Context, p interface{}) (*types.Settings, *types.ErrorResponse, error) {
 	// Set a timeout for the request
 	ctx, cancelCtx := context.WithTimeout(ctx, 10000*time.Millisecond)
 
@@ -65,15 +65,15 @@ func (s *Service) UpdateSettings(ctx context.Context, p interface{}) (*types.Set
 	val := reflect.ValueOf(p)
 	if val.Kind() != reflect.Struct {
 		defer cancelCtx()
-		return nil, fmt.Errorf("updateSettings: Invalid type provided. Expected struct of format types.Settings")
+		return nil, nil, fmt.Errorf("updateSettings: Invalid type provided. Expected struct of format types.Settings")
 	}
 
 	// Make request to update settings via service client
-	if err := s.client.Patch(ctx, "/settings", p, &settings); err != nil {
+	if err := s.client.Patch(ctx, "/settings", p, &settings, &errorResponse); err != nil {
 		defer cancelCtx()
-		return nil, fmt.Errorf("updateSettings: Failed to update settings. %s", err)
+		return nil, nil, fmt.Errorf("updateSettings: Failed to update settings. %s", err)
 	}
 
 	defer cancelCtx()
-	return &settings, nil
+	return &settings, &errorResponse, nil
 }

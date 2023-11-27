@@ -12,6 +12,7 @@ import (
 
 var (
 	generateScriptResponse types.GenerateScriptResponse
+	errorResponse          types.ErrorResponse
 )
 
 // GenerateScript generates a request for a connector setup script
@@ -37,47 +38,55 @@ var (
 //	}
 //
 //	fmt.Println(apps)
-func (s *Service) GenerateScript(ctx context.Context, p interface{}) (*types.GenerateScriptResponse, error) {
+func (s *Service) GenerateScript(ctx context.Context, p interface{}) (*types.GenerateScriptResponse, *types.ErrorResponse, error) {
 	// Set a timeout for the request
 	ctx, cancelCtx := context.WithTimeout(ctx, 10000*time.Millisecond)
 
+	if err := parameterValidation(p); err != nil {
+		defer cancelCtx()
+		return nil, nil, fmt.Errorf("generateScript: Parameter validation failed. %s", err)
+	}
+
+	// Make request for connector setup script via service client
+	if err := s.client.Post(ctx, "/connectors/setup-script", p, &generateScriptResponse, &errorResponse); err != nil {
+		defer cancelCtx()
+		return nil, nil, fmt.Errorf("generateScript: Failed to retrieve script. %s", err)
+	}
+
+	defer cancelCtx()
+	return &generateScriptResponse, &errorResponse, nil
+}
+
+// Validates proper parameters were passed for the GenerateScript API endpoint
+func parameterValidation(p interface{}) error {
 	// Validate provided type
 	val := reflect.ValueOf(p)
 	if val.Kind() != reflect.Struct {
-		defer cancelCtx()
-		return nil, fmt.Errorf("generateScript: Invalid type provided %s. Must be a struct", val.Kind())
+		return fmt.Errorf("parameterValidation: Invalid type provided %s. Must be a struct", val.Kind())
 	}
 
 	// Validate provided fields
-	if val.Field(0).String() != "ConnectorOS" || val.Field(1).String() != "ConnectorType" {
-		defer cancelCtx()
-		return nil, fmt.Errorf("generateScript: Invalid field provided %s. Must be ConnectorOS", val.Field(0).String())
+	field1 := val.FieldByName("ConnectorOS")
+	field2 := val.FieldByName("ConnectorType")
+	if !field1.IsValid() || !field2.IsValid() {
+		return fmt.Errorf("parameterValidation: Invalid fields provided %s, %s. Must be ConnectorOS and ConnectorType", val.Field(0).String(), val.Field(1).String())
 	}
 
 	// Validate provided values
 	validOS := []string{"linux", "windows", "darwin"}
 	validType := []string{"AWS", "AZURE", "GCP", "ON-PREMISE"}
 
-	// Validate provided OS
+	// Validate provided  Connector OS
 	containsOs := slices.Contains(validOS, val.FieldByName("ConnectorOS").String())
 	if !containsOs {
-		defer cancelCtx()
-		return nil, fmt.Errorf("generateScript: Invalid OS provided %s. Valid options are linux, windows, darwin", val.FieldByName("ConnectorOS").String())
+		return fmt.Errorf("parameterValidation: Invalid Connector OS provided %s. Valid options are linux, windows, darwin", val.FieldByName("ConnectorOS").String())
 	}
 
-	// Validate provided Type
+	// Validate provided Connector Type
 	containsType := slices.Contains(validType, val.FieldByName("ConnectorType").String())
 	if !containsType {
-		defer cancelCtx()
-		return nil, fmt.Errorf("generateScript: Invalid Type provided %s. Valid options are AWS, AZURE, GCP, ON-PREMISE", val.FieldByName("ConnectorType").String())
+		return fmt.Errorf("parameterValidation: Invalid Connector Type provided %s. Valid options are AWS, AZURE, GCP, ON-PREMISE", val.FieldByName("ConnectorType").String())
 	}
 
-	// Make request for connector setup script via service client
-	if err := s.client.Post(ctx, "/connectors/setup-script", p, &generateScriptResponse); err != nil {
-		defer cancelCtx()
-		return nil, fmt.Errorf("generateScript: Failed to retrieve script. %s", err)
-	}
-
-	defer cancelCtx()
-	return &generateScriptResponse, nil
+	return nil
 }

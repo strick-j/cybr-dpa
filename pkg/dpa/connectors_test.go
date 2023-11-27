@@ -122,10 +122,13 @@ func TestParameterValidation_FieldValueValidation(t *testing.T) {
 
 func TestGenerateScript(t *testing.T) {
 	var tests = []struct {
-		name    string
-		input   interface{}
-		want    string
-		wantErr bool
+		name     string
+		input    interface{}
+		header   http.ConnState
+		sleep    time.Duration
+		response string
+		want     string
+		wantErr  bool
 	}{
 		{
 			name: "Not Valid Field Values",
@@ -154,102 +157,74 @@ func TestGenerateScript(t *testing.T) {
 				ConnectorOS:   "windows",
 				ConnectorType: "AWS",
 			},
-			wantErr: false,
+			header:   http.StatusOK,
+			sleep:    1 * time.Millisecond,
+			response: `{"script_url":"https://example.com","bash_cmd":"curl -sSL https://example.com | bash"}`,
+			wantErr:  false,
+		},
+		{
+			name: "Status Bad Request",
+			input: struct{ ConnectorOS, ConnectorType string }{
+				ConnectorOS:   "windows",
+				ConnectorType: "AWS",
+			},
+			header:   http.StatusBadRequest,
+			sleep:    1 * time.Millisecond,
+			response: `{"code":"DPA_CONNECTOR_SETUPS_SCRIPT_INVALID_INPUT","message":"Invalid body format","description":"Body should be a dictionary"}`,
+			wantErr:  false,
+		},
+		{
+			name: "Timeout",
+			input: struct{ ConnectorOS, ConnectorType string }{
+				ConnectorOS:   "windows",
+				ConnectorType: "AWS",
+			},
+			header:   http.StatusOK,
+			sleep:    6 * time.Second,
+			response: `{"script_url":"https://example.com","bash_cmd":"curl -sSL https://example.com | bash"}`,
+			wantErr:  false,
+		},
+		{
+			name: "Status Not Found",
+			input: struct{ ConnectorOS, ConnectorType string }{
+				ConnectorOS:   "windows",
+				ConnectorType: "AWS",
+			},
+			header:  http.StatusNotFound,
+			sleep:   1 * time.Millisecond,
+			wantErr: true,
+		},
+		{
+			name: "Status Forbidden",
+			input: struct{ ConnectorOS, ConnectorType string }{
+				ConnectorOS:   "windows",
+				ConnectorType: "AWS",
+			},
+			header:  http.StatusForbidden,
+			sleep:   1 * time.Millisecond,
+			wantErr: true,
 		},
 	}
 
-	// Mock Response
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"script_url":"https://example.com","bash_cmd":"curl -sSL https://example.com | bash"}`))
-	}))
-	defer ts.Close()
-
-	// Valid Token
-	token := &oauth2.Token{
-		AccessToken: "123",
-		TokenType:   "bearer",
-		Expiry:      time.Now().Add(5 * time.Hour),
-	}
-	// Valid Service using httptest New Server URL
-	ns, _ := NewService(ts.URL, "api", false, token)
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, _, err := ns.GenerateScript(context.Background(), tt.input)
-			if tt.wantErr {
-				if err == nil {
-					t.Errorf("GenerateScript() error = %v, wantErr %v", err, tt.wantErr)
-				}
-			} else {
-				if err != nil {
-					t.Errorf("GenerateScript() error = %v, wantErr %v", err, tt.wantErr)
-				}
+			// Mock Response
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(int(tt.header))
+				time.Sleep(tt.sleep)
+				w.Write([]byte(tt.response))
+			}))
+			defer ts.Close()
+
+			// Valid Token
+			token := &oauth2.Token{
+				AccessToken: "123",
+				TokenType:   "bearer",
+				Expiry:      time.Now().Add(5 * time.Hour),
 			}
-		})
-	}
-}
-
-// Unexpected error returned
-// Want error for all test cases
-func TestGenerateScriptUnexpectedError(t *testing.T) {
-	var tests = []struct {
-		name    string
-		input   interface{}
-		want    string
-		wantErr bool
-	}{
-		{
-			name: "Not Valid Field Values",
-			input: struct{ ConnectorOS, ConnectorType string }{
-				ConnectorOS:   "ubuntu",
-				ConnectorType: "AWS",
-			},
-			wantErr: true,
-		},
-		{
-			name: "Not Valid Field Name",
-			input: struct{ OS, ConnectorType string }{
-				OS:            "linux",
-				ConnectorType: "AWS",
-			},
-			wantErr: true,
-		},
-		{
-			name:    "Not Valid Type",
-			input:   "test",
-			wantErr: true,
-		},
-		{
-			name: "Valid Values",
-			input: struct{ ConnectorOS, ConnectorType string }{
-				ConnectorOS:   "windows",
-				ConnectorType: "AWS",
-			},
-			wantErr: false,
-		},
-	}
-
-	// Mock Response
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"code":"DPA_CONNECTOR_SETUPS_SCRIPT_INVALID_INPUT","message":"Invalid body format","description":"Body should be a dictionary"}`))
-	}))
-	defer ts.Close()
-
-	// Valid Token
-	token := &oauth2.Token{
-		AccessToken: "123",
-		TokenType:   "bearer",
-		Expiry:      time.Now().Add(5 * time.Hour),
-	}
-	// Valid Service using httptest New Server URL
-	ns, _ := NewService(ts.URL, "api", false, token)
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+			// Valid Service using httptest New Server URL
+			ns, _ := NewService(ts.URL, "api", false, token)
 			_, _, err := ns.GenerateScript(context.Background(), tt.input)
 			if tt.wantErr {
 				if err == nil {

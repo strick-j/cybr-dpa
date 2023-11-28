@@ -10,6 +10,13 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// Valid token used in all tests
+var validToken = &oauth2.Token{
+	AccessToken: "123",
+	TokenType:   "bearer",
+	Expiry:      time.Now().Add(5 * time.Hour),
+}
+
 func TestListTargetSets(t *testing.T) {
 	var tests = []struct {
 		name     string
@@ -90,14 +97,8 @@ func TestListTargetSets(t *testing.T) {
 			}))
 			defer ts.Close()
 
-			// Valid Token
-			token := &oauth2.Token{
-				AccessToken: "123",
-				TokenType:   "bearer",
-				Expiry:      time.Now().Add(5 * time.Hour),
-			}
 			// Valid Service using httptest New Server URL
-			ns, _ := NewService(ts.URL, "api", false, token)
+			ns, _ := NewService(ts.URL, "api", false, validToken)
 
 			_, _, err := ns.ListTargetSets(context.Background(), tt.input)
 			if tt.wantErr {
@@ -114,9 +115,137 @@ func TestListTargetSets(t *testing.T) {
 }
 
 func TestAddTargetSet(t *testing.T) {
+	var tests = []struct {
+		name     string
+		input    interface{}
+		header   http.ConnState
+		sleep    time.Duration
+		response string
+		wantErr  bool
+	}{
+		{
+			name:    "Invalid Input",
+			input:   "String input not slice",
+			wantErr: true,
+		},
+		{
+			name: "Invalid Struct Bad Request",
+			input: struct {
+				isMfaCachingEnabled bool
+			}{
+				isMfaCachingEnabled: true,
+			},
+			response: `{
+				"tenant_id": "28515795-2bad-4468-8eb7-026a68520adf",
+				"exception": "Validation error occurred while doing target set bulk operation [1 validation error for TargetSetsBulkMappingDto\ntarget_sets_mapping\n  field required (type=value_error.missing)]"
+			}`,
+			header:  http.StatusBadRequest,
+			sleep:   1 * time.Millisecond,
+			wantErr: false,
+		},
+		{
+			name:     "Add Target Set Timeout",
+			input:    []string{},
+			response: `{"results":[]}`,
+			header:   http.StatusOK,
+			sleep:    6 * time.Second,
+			wantErr:  true,
+		},
+	}
 
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Mock Response
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				time.Sleep(tt.sleep)
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(int(tt.header))
+				w.Write([]byte(tt.response))
+			}))
+			defer ts.Close()
+
+			// Valid Service using httptest New Server URL
+			ns, _ := NewService(ts.URL, "api", false, validToken)
+
+			_, _, err := ns.DeleteTargetSet(context.Background(), tt.input)
+			if tt.wantErr {
+				if err == nil {
+					t.Errorf("DeleteTargetSet() error = %v, wantErr %v", err, tt.wantErr)
+				}
+			} else {
+				if err != nil {
+					t.Errorf("DeleteTargetSet() error = %v, wantErr %v", err, tt.wantErr)
+				}
+			}
+		})
+	}
 }
 
 func TestDeleteTargetSet(t *testing.T) {
+	var tests = []struct {
+		name     string
+		input    interface{}
+		header   http.ConnState
+		sleep    time.Duration
+		response string
+		wantErr  bool
+	}{
+		{
+			name:    "Invalid Input",
+			input:   "String input not slice",
+			wantErr: true,
+		},
+		{
+			name:     "Empty Slice",
+			input:    []string{},
+			response: `{"results":[]}`,
+			header:   http.StatusOK,
+			sleep:    1 * time.Millisecond,
+			wantErr:  false,
+		},
+		{
+			name:     "Delete Target Set Timeout",
+			input:    []string{},
+			response: `{"results":[]}`,
+			header:   http.StatusOK,
+			sleep:    6 * time.Second,
+			wantErr:  true,
+		},
+		{
+			name:     "Valid Deletion",
+			input:    []string{"example.com"},
+			response: `{"results":[{"strong_account_id": null,"target_set_name":"example.com","success": true}]}`,
+			header:   http.StatusMultiStatus,
+			sleep:    1 * time.Millisecond,
+			wantErr:  false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Mock Response
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				time.Sleep(tt.sleep)
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(int(tt.header))
+				w.Write([]byte(tt.response))
+			}))
+			defer ts.Close()
+
+			// Valid Service using httptest New Server URL
+			ns, _ := NewService(ts.URL, "api", false, validToken)
+
+			_, _, err := ns.DeleteTargetSet(context.Background(), tt.input)
+			if tt.wantErr {
+				if err == nil {
+					t.Errorf("DeleteTargetSet() error = %v, wantErr %v", err, tt.wantErr)
+				}
+			} else {
+				if err != nil {
+					t.Errorf("DeleteTargetSet() error = %v, wantErr %v", err, tt.wantErr)
+				}
+			}
+		})
+	}
 
 }

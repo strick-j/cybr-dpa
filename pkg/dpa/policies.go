@@ -16,8 +16,18 @@ var (
 	getPolicy    types.Policy
 )
 
+// ListPolicies returns all of the currently configured policies
+// Returns types.ListPolicies or types.ErrorResponse based on the
+// response from the API. An error is returned on request failure
+// Example:
+//
+//	resp, errResp, err := s.ListPolicies(context.Background())
+//	if err != nil {
+//		log.Fatalf("Failed to list policies. %s", err)
+//		return
+//	}
 func (s *Service) ListPolicies(ctx context.Context) (*types.ListPolicies, *types.ErrorResponse, error) {
-	ctx, cancelCtx := context.WithTimeout(ctx, 20000*time.Millisecond)
+	ctx, cancelCtx := context.WithTimeout(ctx, 5*time.Second)
 	if err := s.client.Get(ctx, "/access-policies", &listPolicies, &errorResponse); err != nil {
 		defer cancelCtx()
 		return nil, nil, fmt.Errorf("listPolicies: Failed to get access policies. %s", err)
@@ -27,8 +37,19 @@ func (s *Service) ListPolicies(ctx context.Context) (*types.ListPolicies, *types
 	return &listPolicies, &errorResponse, nil
 }
 
+// GetPolicy returns a specific policy
+// Returns types.Policy or types.ErrorResponse based on the
+// response from the API. An error is returned on request failure
+// Example:
+//
+//	policyID := "c12f982a-ab1a-12ab-1a31-f221aa31836b"
+//	resp, errResp, err := s.ListPolicies(context.Background(), policyID)
+//	if err != nil {
+//		log.Fatalf("Failed to list policies. %s", err)
+//		return
+//	}
 func (s *Service) GetPolicy(ctx context.Context, p string) (*types.Policy, *types.ErrorResponse, error) {
-	ctx, cancelCtx := context.WithTimeout(ctx, 20000*time.Millisecond)
+	ctx, cancelCtx := context.WithTimeout(ctx, 5*time.Second)
 
 	// Check if policy name is empty
 	if len(p) == 0 {

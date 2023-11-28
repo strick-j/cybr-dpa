@@ -198,6 +198,8 @@ func (c *Client) do(r *http.Request) (*http.Response, bool, error) {
 		return resp, true, nil
 	case http.StatusBadRequest,
 		http.StatusUnauthorized,
+		http.StatusForbidden,
+		http.StatusNotFound,
 		http.StatusInternalServerError:
 		return resp, false, nil
 	}
@@ -205,10 +207,6 @@ func (c *Client) do(r *http.Request) (*http.Response, bool, error) {
 	defer resp.Body.Close()
 
 	switch resp.StatusCode {
-	case http.StatusNotFound:
-		return nil, false, ErrNotFound
-	case http.StatusForbidden:
-		return nil, false, ErrUserAccessDenied
 	case http.StatusTooManyRequests:
 		return nil, false, ErrTooManyRequests
 	}

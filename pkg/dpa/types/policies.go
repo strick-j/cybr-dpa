@@ -22,6 +22,7 @@ type Items struct {
 
 // Get policy response from getting a policy
 type Policy struct {
+	PolicyID        string            `json:"policyId,omitempty"`
 	PolicyName      string            `json:"policyName,omitempty"`
 	Status          string            `json:"status,omitempty"`
 	Description     string            `json:"description,omitempty"`
@@ -72,6 +73,7 @@ type ProvidersData struct {
 	OnPrem OnPrem `json:"OnPrem,omitempty"`
 	Gcp    Gcp    `json:"GCP,omitempty"`
 }
+
 type Roles struct {
 	Name   string `json:"name,omitempty"`
 	Source string `json:"source,omitempty"`
@@ -85,10 +87,15 @@ type Users struct {
 	Source string `json:"source,omitempty"`
 }
 type UserData struct {
-	Roles  []Roles  `json:"Roles,omitempty"`
+	Roles  []Roles  `json:"roles,omitempty"`
 	Groups []Groups `json:"Groups,omitempty"`
 	Users  []Users  `json:"users,omitempty"`
 }
+type UserDataAttributes struct {
+	Name   string `json:"name,omitempty"`
+	Source string `json:"source,omitempty"`
+}
+
 type LocalEphemeralUser struct {
 	AssignGroups []string `json:"assignGroups,omitempty"`
 }

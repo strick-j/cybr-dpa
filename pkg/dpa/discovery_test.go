@@ -167,14 +167,14 @@ func TestAddTargetSet(t *testing.T) {
 			// Valid Service using httptest New Server URL
 			ns, _ := NewService(ts.URL, "api", false, validToken)
 
-			_, _, err := ns.DeleteTargetSet(context.Background(), tt.input)
+			_, _, err := ns.AddTargetSet(context.Background(), tt.input)
 			if tt.wantErr {
 				if err == nil {
-					t.Errorf("DeleteTargetSet() error = %v, wantErr %v", err, tt.wantErr)
+					t.Errorf("AddTargetSet() error = %v, wantErr %v", err, tt.wantErr)
 				}
 			} else {
 				if err != nil {
-					t.Errorf("DeleteTargetSet() error = %v, wantErr %v", err, tt.wantErr)
+					t.Errorf("AddTargetSet() error = %v, wantErr %v", err, tt.wantErr)
 				}
 			}
 		})

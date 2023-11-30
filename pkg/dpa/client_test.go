@@ -322,14 +322,12 @@ func TestDoRequest(t *testing.T) {
 		name     string
 		header   http.ConnState
 		response interface{}
-		payload  interface{}
 		wantErr  bool
 	}{
 		{
 			name:     "Valid - StatusOK",
 			header:   http.StatusOK,
 			response: struct{ Example string }{},
-			payload:  map[string]string{"example": "valid"},
 			wantErr:  true,
 		},
 	}

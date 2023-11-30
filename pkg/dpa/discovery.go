@@ -11,9 +11,8 @@ import (
 )
 
 var (
-	addTargetSetResponse    types.AddTargetSetResponse
-	listTargetSetResponse   types.ListTargetSetResponse
-	deleteTargetSetResponse types.DeleteTargetSetResponse
+	targetSetActivityResponse types.TargetSetActivityResponse
+	listTargetSetResponse     types.ListTargetSetResponse
 )
 
 // ListTargetSets returns a list of target sets
@@ -80,7 +79,7 @@ func (s *Service) ListTargetSets(ctx context.Context, query interface{}) (*types
 // The request body should be a struct containing an array of target sets
 // Struct is defined in pkg/cybr/dpa/types/dicovery.go as TargetSetMapping
 //
-// Returns types.AddTargetSetResonse or types.ErrorResponse based on the
+// Returns types.TargetSetActivityResponse or types.ErrorResponse based on the
 // response from the API. An error is returned on request failure
 //
 // Example:
@@ -104,7 +103,7 @@ func (s *Service) ListTargetSets(ctx context.Context, query interface{}) (*types
 //		log.Fatalf("Failed to add target sets. %s", err)
 //		return
 //	}
-func (s *Service) AddTargetSet(ctx context.Context, p interface{}) (*types.AddTargetSetResponse, *types.ErrorResponse, error) {
+func (s *Service) AddTargetSet(ctx context.Context, p interface{}) (*types.TargetSetActivityResponse, *types.ErrorResponse, error) {
 	// Set a timeout for the request
 	ctx, cancelCtx := context.WithTimeout(ctx, 5*time.Second)
 
@@ -116,13 +115,13 @@ func (s *Service) AddTargetSet(ctx context.Context, p interface{}) (*types.AddTa
 	}
 
 	// Make request to add policy via service client
-	if err := s.client.Post(ctx, "/discovery/targetsets", p, &addTargetSetResponse, &errorResponse); err != nil {
+	if err := s.client.Post(ctx, "/discovery/targetsets", p, &targetSetActivityResponse, &errorResponse); err != nil {
 		defer cancelCtx()
 		return nil, nil, fmt.Errorf("addTargetSet: Failed to add Target Set. %s", err)
 	}
 
 	defer cancelCtx()
-	return &addTargetSetResponse, &errorResponse, nil
+	return &targetSetActivityResponse, &errorResponse, nil
 }
 
 // DeleteTargetSet provides the ability to delete target sets
@@ -130,7 +129,7 @@ func (s *Service) AddTargetSet(ctx context.Context, p interface{}) (*types.AddTa
 //
 //	["targetset1", "targetset2"]
 //
-// Returns types.DeleteTargetSetesponse or types.ErrorResponse based on the
+// Returns types.TargetSetActivityResponse or types.ErrorResponse based on the
 // response from the API. An error is returned on request failure
 //
 // Example:
@@ -144,7 +143,7 @@ func (s *Service) AddTargetSet(ctx context.Context, p interface{}) (*types.AddTa
 //		log.Fatalf("Failed to delete target sets. %s", err)
 //		return
 //	}
-func (s *Service) DeleteTargetSet(ctx context.Context, p interface{}) (*types.DeleteTargetSetResponse, *types.ErrorResponse, error) {
+func (s *Service) DeleteTargetSet(ctx context.Context, p interface{}) (*types.TargetSetActivityResponse, *types.ErrorResponse, error) {
 	// Set a timeout for the request
 	ctx, cancelCtx := context.WithTimeout(ctx, 5*time.Second)
 
@@ -157,11 +156,11 @@ func (s *Service) DeleteTargetSet(ctx context.Context, p interface{}) (*types.De
 
 	// Make request to delete target set(s) via service client
 	path := "/discovery/targetsets/bulk"
-	if err := s.client.Delete(ctx, path, p, &deleteTargetSetResponse, &errorResponse); err != nil {
+	if err := s.client.Delete(ctx, path, p, &targetSetActivityResponse, &errorResponse); err != nil {
 		defer cancelCtx()
 		return nil, nil, fmt.Errorf("deleteTargetSet: Failed to delete target set. %s", err)
 	}
 
 	defer cancelCtx()
-	return &deleteTargetSetResponse, &errorResponse, nil
+	return &targetSetActivityResponse, &errorResponse, nil
 }

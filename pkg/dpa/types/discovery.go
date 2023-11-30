@@ -15,19 +15,15 @@ type TargetSets struct {
 	Type                        string `json:"type,omitempty"`
 }
 
-// DeleteTargetSetResponse is the struct response provided when deleting a target set
-type DeleteTargetSetResponse struct {
-	Results []Results `json:"results,omitempty"`
-}
-
 // TargetSetMapping is the struct format utilized to post a target set to the API
 type TargetSetMapping struct {
 	StrongAccountID string       `json:"strong_account_id,omitempty"`
 	TargetSets      []TargetSets `json:"target_sets,omitempty"`
 }
 
-// Results is the struct response provided when adding a target set
-type AddTargetSetResponse struct {
+// Results is the struct response provided when adding a target set, updating,
+// or deleting a TargetSet
+type TargetSetActivityResponse struct {
 	Results []Results `json:"results,omitempty"`
 }
 type Results struct {

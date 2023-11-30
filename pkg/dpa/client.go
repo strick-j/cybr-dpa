@@ -110,16 +110,16 @@ func (c *Client) Delete(ctx context.Context, path string, payload interface{}, v
 	return nil
 }
 
-////////////// REQUEST PROCESSING - newRequest, doRequest, do ///////////////////////////////////////////////
-
 func (c *Client) newRequest(ctx context.Context, method, path string, payload interface{}) (*http.Request, error) {
 	var reqBody io.Reader
-	if payload != nil {
-		bodyBytes, err := json.Marshal(payload)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal request body: %w", err)
+	if method != http.MethodGet {
+		if payload != nil {
+			bodyBytes, err := json.Marshal(payload)
+			if err != nil {
+				return nil, fmt.Errorf("failed to marshal request body: %w", err)
+			}
+			reqBody = bytes.NewReader(bodyBytes)
 		}
-		reqBody = bytes.NewReader(bodyBytes)
 	}
 
 	req, err := http.NewRequest(method, fmt.Sprintf("%s%s", c.options.ApiURL, path), reqBody)

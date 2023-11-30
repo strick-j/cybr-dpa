@@ -78,6 +78,29 @@ func (s *Service) ListTargetSets(ctx context.Context, query interface{}) (*types
 // AddTargetSet adds a target set or multiple target sets
 // The request body should be a struct containing an array of target sets
 // Struct is defined in pkg/cybr/dpa/types/dicovery.go as TargetSetMapping
+//
+// Returns types.AddTargetSetResonse or types.ErrorResponse based on the
+// response from the API. An error is returned on request failure
+// Example:
+//
+//	// TargetSet Struct
+//	payload := types.TargetSetMapping{
+//		StrongAccountID: "string",
+//		TargetSets: []types.TargetSets{
+//			Name: "string",
+//			Description: "string",
+//			ProvisionFormat: "string",
+//			EnableCertificateValidation: bool,
+//			SecretType: "string",
+//			SecretID: "string",
+//			Type: "string",
+//		},
+//	}
+//
+//	resp, errResp, err := s.ListTargetSets(context.Background(), payload)
+//	if err != nil {
+//		log.Fatalf("Failed to add target sets. %s", err)
+//		return
 func (s *Service) AddTargetSet(ctx context.Context, p interface{}) (*types.AddTargetSetResponse, *types.ErrorResponse, error) {
 	// Set a timeout for the request
 	ctx, cancelCtx := context.WithTimeout(ctx, 5*time.Second)

@@ -101,6 +101,7 @@ func (s *Service) ListTargetSets(ctx context.Context, query interface{}) (*types
 //	if err != nil {
 //		log.Fatalf("Failed to add target sets. %s", err)
 //		return
+//	}
 func (s *Service) AddTargetSet(ctx context.Context, p interface{}) (*types.AddTargetSetResponse, *types.ErrorResponse, error) {
 	// Set a timeout for the request
 	ctx, cancelCtx := context.WithTimeout(ctx, 5*time.Second)

@@ -19,6 +19,7 @@ var (
 // Body is optional, if nothing is provided a default script will be generated
 // The default script will be for a linux connector in AWS
 // Returns a GenerateScriptResponse or error if failed
+//
 // Example:
 //
 //	// Create Body for GenerateScript Request
@@ -31,7 +32,7 @@ var (
 //	}
 //
 //	// Generate Script using existing Service and Client
-//	apps, err := s.GenerateScript(context.Background(), generateScriptRequest)
+//	apps, dpaerr, err := s.GenerateScript(context.Background(), generateScriptRequest)
 //	if err != nil {
 //		log.Fatalf("Failed to generate connector script. %s", err)
 //		return

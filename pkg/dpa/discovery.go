@@ -81,6 +81,7 @@ func (s *Service) ListTargetSets(ctx context.Context, query interface{}) (*types
 //
 // Returns types.AddTargetSetResonse or types.ErrorResponse based on the
 // response from the API. An error is returned on request failure
+//
 // Example:
 //
 //	// TargetSet Struct
@@ -97,7 +98,7 @@ func (s *Service) ListTargetSets(ctx context.Context, query interface{}) (*types
 //		},
 //	}
 //
-//	resp, errResp, err := s.ListTargetSets(context.Background(), payload)
+//	resp, dpaerr, err := s.ListTargetSets(context.Background(), payload)
 //	if err != nil {
 //		log.Fatalf("Failed to add target sets. %s", err)
 //		return
@@ -130,13 +131,14 @@ func (s *Service) AddTargetSet(ctx context.Context, p interface{}) (*types.AddTa
 //
 // Returns types.DeleteTargetSetesponse or types.ErrorResponse based on the
 // response from the API. An error is returned on request failure
+//
 // Example:
 //
 //	// Create body for DeleteTargetSet Request
 //	payload := []string{"targetsetid1","targetsetid2"}
 //
 //	// Delete Target Sets using slice
-//	resp, errResp, err := s.DeleteTargetSet(context.Background(), payload)
+//	resp, dpaerr, err := s.DeleteTargetSet(context.Background(), payload)
 //	if err != nil {
 //		log.Fatalf("Failed to delete target sets. %s", err)
 //		return

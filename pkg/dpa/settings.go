@@ -17,10 +17,11 @@ var (
 // ListSettings provides all settings as a response.
 // Returns a types.Settings response or types.ErrorResponse based on the
 // response from the API. An error is returned on request failure
+//
 // Example:
 //
 //	// List Settings
-//	resp, errResp, err := s.ListSettings(context.Background())
+//	resp, dpaerr, err := s.ListSettings(context.Background())
 //	if err != nil {
 //		log.Fatalf("Failed to retrieve settings. %s", err)
 //		return
@@ -41,12 +42,14 @@ func (s *Service) ListSettings(ctx context.Context) (*types.Settings, *types.Err
 // ListSettingsFeature provides a specific setting reponse.
 // Valid input strings are:
 // 'MFA_CACHING', 'STANDING_ACCESS', 'SSH_COMMAND_AUDIT', 'RDP_FILE_TRANSFER', 'CERTIFICATE_VALIDATION'
+//
 // Returns a types.Settings response or types.ErrorResponse based on the
 // response from the API. An error is returned on request failure
+//
 // Example:
 //
 //	// List Settings Feature
-//	resp, errResp, err := s.ListSettingsFeature(context.Background(), "MFA_CACHING")
+//	resp, dpaerr, err := s.ListSettingsFeature(context.Background(), "MFA_CACHING")
 //	if err != nil {
 //		log.Fatalf("Failed to retrieve setting. %s", err)
 //		return
@@ -69,23 +72,24 @@ func (s *Service) ListSettingsFeature(ctx context.Context, f string) (*types.Fea
 // Expects a struct of type types.Settings
 // Returns a types.Settings response or types.ErrorResponse based on the
 // response from the API. An error is returned on request failure
+//
 // Example:
 //
-//		// Create Body for UpdateSettings Request
-//	 	updateSettingsRequest := struct {
-//			IsMfaCachingEnabled  bool `json:"isMfaCachingEnabled,omitempty"`
-//			KeyExpirationTimeSec int  `json:"keyExpirationTimeSec,omitempty"`
-//		}{
-//			true,
-//			3600
-//		}
+//	// Create Body for UpdateSettings Request
+//	updateSettingsRequest := struct {
+//		IsMfaCachingEnabled  bool `json:"isMfaCachingEnabled,omitempty"`
+//		KeyExpirationTimeSec int  `json:"keyExpirationTimeSec,omitempty"`
+//	}{
+//		true,
+//		3600
+//	}
 //
-//		// Update settings using created struct
-//		resp, errResp, err := s.UpdateSettings(context.Background(), updateSettingsRequest)
-//		if err != nil {
-//			log.Fatalf("Failed to update settings. %s", err)
-//			return
-//		}
+//	// Update settings using created struct
+//	resp, dpaerr, err := s.UpdateSettings(context.Background(), updateSettingsRequest)
+//	if err != nil {
+//		log.Fatalf("Failed to update settings. %s", err)
+//		return
+//	}
 func (s *Service) UpdateSettings(ctx context.Context, p interface{}) (*types.Settings, *types.ErrorResponse, error) {
 	// Set a timeout for the request
 	ctx, cancelCtx := context.WithTimeout(ctx, 10000*time.Millisecond)

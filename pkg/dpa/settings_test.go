@@ -42,7 +42,7 @@ func TestListSettings_BadRequest(t *testing.T) {
 func TestListSettings_Timeout(t *testing.T) {
 	// Mock Response
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		time.Sleep(11 * time.Second)
+		time.Sleep(6 * time.Second)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`{"code":"DPA_INVALID_VALUE","message":"error message","description":"error description"}`))
@@ -130,7 +130,7 @@ func TestListSettingsFeature(t *testing.T) {
 			input:    "MFA_CACHING",
 			header:   http.StatusOK,
 			response: `{"feature_name":"MFA_CACHING","feature_conf":{"is_mfa_caching_enabled":true,"key_expiration_time_sec":3600}}`,
-			sleep:    11 * time.Second,
+			sleep:    6 * time.Second,
 			wantErr:  true,
 		},
 	}
@@ -193,7 +193,7 @@ func TestUpdateSettings(t *testing.T) {
 				isMfaCachingEnabled:  true,
 				keyExpirationTimeSec: 3600,
 			},
-			sleep:    11 * time.Second,
+			sleep:    6 * time.Second,
 			header:   http.StatusOK,
 			response: `{"feature_name":"MFA_CACHING","feature_conf":{"is_mfa_caching_enabled":true,"key_expiration_time_sec":3600}}`,
 			wantErr:  true,

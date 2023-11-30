@@ -28,7 +28,7 @@ var (
 //	}
 func (s *Service) ListSettings(ctx context.Context) (*types.Settings, *types.ErrorResponse, error) {
 	// Set a timeout for the request
-	ctx, cancelCtx := context.WithTimeout(ctx, 10000*time.Millisecond)
+	ctx, cancelCtx := context.WithTimeout(ctx, 5*time.Second)
 
 	// Make request for settings via service client
 	if err := s.client.Get(ctx, "/settings", &settings, &errorResponse); err != nil {
@@ -56,7 +56,7 @@ func (s *Service) ListSettings(ctx context.Context) (*types.Settings, *types.Err
 //	}
 func (s *Service) ListSettingsFeature(ctx context.Context, f string) (*types.FeatureSetting, *types.ErrorResponse, error) {
 	// Set a timeout for the request
-	ctx, cancelCtx := context.WithTimeout(ctx, 10000*time.Millisecond)
+	ctx, cancelCtx := context.WithTimeout(ctx, 5*time.Second)
 
 	// Make request for specific setting via service client
 	if err := s.client.Get(ctx, fmt.Sprintf("%s/%s", "/settings", f), &featureSetting, &errorResponse); err != nil {
@@ -92,7 +92,7 @@ func (s *Service) ListSettingsFeature(ctx context.Context, f string) (*types.Fea
 //	}
 func (s *Service) UpdateSettings(ctx context.Context, p interface{}) (*types.Settings, *types.ErrorResponse, error) {
 	// Set a timeout for the request
-	ctx, cancelCtx := context.WithTimeout(ctx, 10000*time.Millisecond)
+	ctx, cancelCtx := context.WithTimeout(ctx, 5*time.Second)
 
 	// Validate provided type
 	val := reflect.ValueOf(p)

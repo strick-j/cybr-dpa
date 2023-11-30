@@ -61,6 +61,7 @@ func TestListPolicies(t *testing.T) {
 		{
 			name:    "Invalid Timeout",
 			sleep:   6 * time.Second,
+			header:  http.StatusOK,
 			wantErr: true,
 		},
 		{
@@ -151,6 +152,13 @@ func TestGetPolicy(t *testing.T) {
 			input:   "c12f982a-ab1a-12ab-1a31-f221aa31836a",
 			header:  http.StatusOK,
 			sleep:   6 * time.Second,
+			wantErr: true,
+		},
+		{
+			name:    "Empty Policy ID",
+			input:   "",
+			header:  http.StatusOK,
+			sleep:   1 * time.Millisecond,
 			wantErr: true,
 		},
 		{
@@ -337,7 +345,7 @@ func TestAddPolicy(t *testing.T) {
 			defer ts.Close()
 
 			// Valid Service using httptest New Server URL
-			ns, _ := NewService(ts.URL, "api", true, validToken)
+			ns, _ := NewService(ts.URL, "api", false, validToken)
 
 			_, _, err := ns.AddPolicy(context.Background(), tt.input)
 			if tt.wantErr {
@@ -483,7 +491,7 @@ func TestUpdatePolicy(t *testing.T) {
 			defer ts.Close()
 
 			// Valid Service using httptest New Server URL
-			ns, _ := NewService(ts.URL, "api", true, validToken)
+			ns, _ := NewService(ts.URL, "api", false, validToken)
 
 			_, _, err := ns.UpdatePolicy(context.Background(), tt.input, tt.id)
 			if tt.wantErr {
@@ -551,7 +559,7 @@ func TestDeletePolicy(t *testing.T) {
 			defer ts.Close()
 
 			// Valid Service using httptest New Server URL
-			ns, _ := NewService(ts.URL, "api", true, validToken)
+			ns, _ := NewService(ts.URL, "api", false, validToken)
 
 			_, err := ns.DeletePolicy(context.Background(), tt.input)
 			if tt.wantErr {

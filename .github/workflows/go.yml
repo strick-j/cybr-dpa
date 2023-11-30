@@ -27,7 +27,6 @@ jobs:
 
     - name: Install dependencies
       run: |
-        go get .
         go get golang.org/x/oauth2
 
     - name: Test

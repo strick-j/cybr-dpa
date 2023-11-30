@@ -1,6 +1,6 @@
 module github.com/strick-j/cybr-dpa
 
-go 1.21.4
+go 1.21
 
 require golang.org/x/oauth2 v0.15.0
 

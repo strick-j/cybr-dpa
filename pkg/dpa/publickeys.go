@@ -17,7 +17,19 @@ var (
 
 // GetPublicKey returns the public key for the DPA Workspace
 // Expects an ordered map of the query parameters
-// Returns a PublicKey or error if failed
+// Returns a PublicKey, DPA Error Response, or generic error if failed.
+//
+// Example:
+//
+//	// Create query for GetPublicKey
+//	query := map[string]string{"workspaceId":"12347578363","workspaceType":"AWS"}
+//
+//	// Call GetPublicKey wtih query
+//	apps, dpaerr, err := s.GetPublicKey(context.Background(), query)
+//	if err != nil {
+//		log.Fatalf("Failed to generate connector script. %s", err)
+//		return
+//	}
 func (s *Service) GetPublicKey(ctx context.Context, query interface{}) (*types.PublicKey, *types.ErrorResponse, error) {
 	ctx, cancelCtx := context.WithTimeout(ctx, 5*time.Second)
 
@@ -51,9 +63,21 @@ func (s *Service) GetPublicKey(ctx context.Context, query interface{}) (*types.P
 	return &types.PublicKey{PublicKey: publicKey}, &errorResponse, nil
 }
 
-// GetPublicKeyScript returns the public key setup script
+// GetPublicKeyScript returns the public key script for the DPA Workspace
 // Expects an ordered map of the query parameters
-// Returns a PublicKey struct or error if failed
+// Returns a PublicKeyScript, DPA Error Response, or generic error if failed.
+//
+// Example:
+//
+//	// Create query for GetPublicKeyScript
+//	query := map[string]string{"workspaceId":"12347578363","workspaceType":"AWS"}
+//
+//	// Call GetPublicKeyScript wtih query
+//	apps, dpaerr, err := s.GetPublicKeyScript(context.Background(), query)
+//	if err != nil {
+//		log.Fatalf("Failed to generate connector script. %s", err)
+//		return
+//	}
 func (s *Service) GetPublicKeyScript(ctx context.Context, query interface{}) (*types.PublicKeyScript, *types.ErrorResponse, error) {
 	ctx, cancelCtx := context.WithTimeout(ctx, 5*time.Second)
 

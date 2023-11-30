@@ -44,7 +44,6 @@ type HTTPClient interface {
 	Delete(ctx context.Context, path string, payload interface{}, v interface{}, e interface{}) error
 }
 
-// //////////// COMMON METHODS - GET, POST, PUT, PATCH,  DELETE ///////////////////////////////////////////////
 func (c *Client) Get(ctx context.Context, path string, v interface{}, e interface{}) error {
 	req, err := c.newRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {

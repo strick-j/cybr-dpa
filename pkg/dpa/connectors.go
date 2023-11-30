@@ -36,8 +36,6 @@ var (
 //		log.Fatalf("Failed to generate connector script. %s", err)
 //		return
 //	}
-//
-//	fmt.Println(apps)
 func (s *Service) GenerateScript(ctx context.Context, p interface{}) (*types.GenerateScriptResponse, *types.ErrorResponse, error) {
 	// Set a timeout for the request
 	ctx, cancelCtx := context.WithTimeout(ctx, 10000*time.Millisecond)

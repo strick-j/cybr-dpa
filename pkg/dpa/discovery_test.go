@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/strick-j/cybr-dpa/pkg/dpa/types"
 	"golang.org/x/oauth2"
 )
 
@@ -162,6 +163,34 @@ func TestAddTargetSet(t *testing.T) {
 			header:   http.StatusTooManyRequests,
 			sleep:    1 * time.Millisecond,
 			wantErr:  true,
+		},
+		{
+			name: "Add Target Set Success",
+			input: types.TargetSetMapping{
+				StrongAccountID: "1239-809e-45ab-abef-d424244cc810e",
+				TargetSets: []types.TargetSets{
+					{
+						Name:                        "test.com",
+						ProvisionFormat:             "<user>-<session-guid>",
+						EnableCertificateValidation: true,
+						SecretType:                  "PCloudAccount",
+						SecretID:                    "1239-809e-45ab-abef-d424244cc810e",
+						Type:                        "Domain",
+					},
+				},
+			},
+			response: `{
+				"results": [
+					{
+						"strong_account_id": "1239-809e-45ab-abef-d424244cc810e",
+						"target_set_name": "test.com",
+						"success": true
+					}
+				]
+			}`,
+			header:  http.StatusOK,
+			sleep:   1 * time.Millisecond,
+			wantErr: false,
 		},
 	}
 

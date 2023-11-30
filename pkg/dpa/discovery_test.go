@@ -151,6 +151,18 @@ func TestAddTargetSet(t *testing.T) {
 			sleep:    6 * time.Second,
 			wantErr:  true,
 		},
+		{
+			name: "Add Target Set Unhandled Error",
+			input: struct {
+				isMfaCachingEnabled bool
+			}{
+				isMfaCachingEnabled: true,
+			},
+			response: `{"results":[]}`,
+			header:   http.StatusTooManyRequests,
+			sleep:    1 * time.Millisecond,
+			wantErr:  true,
+		},
 	}
 
 	for _, tt := range tests {

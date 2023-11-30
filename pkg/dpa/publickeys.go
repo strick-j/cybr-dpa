@@ -27,7 +27,7 @@ var (
 //	// Call GetPublicKey wtih query
 //	apps, dpaerr, err := s.GetPublicKey(context.Background(), query)
 //	if err != nil {
-//		log.Fatalf("Failed to generate connector script. %s", err)
+//		log.Fatalf("Failed to retrieve public key. %s", err)
 //		return
 //	}
 func (s *Service) GetPublicKey(ctx context.Context, query interface{}) (*types.PublicKey, *types.ErrorResponse, error) {
@@ -75,7 +75,7 @@ func (s *Service) GetPublicKey(ctx context.Context, query interface{}) (*types.P
 //	// Call GetPublicKeyScript wtih query
 //	apps, dpaerr, err := s.GetPublicKeyScript(context.Background(), query)
 //	if err != nil {
-//		log.Fatalf("Failed to generate connector script. %s", err)
+//		log.Fatalf("Failed to generate public key script. %s", err)
 //		return
 //	}
 func (s *Service) GetPublicKeyScript(ctx context.Context, query interface{}) (*types.PublicKeyScript, *types.ErrorResponse, error) {

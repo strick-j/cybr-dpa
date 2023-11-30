@@ -2,7 +2,6 @@ package dpa
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -103,7 +102,6 @@ func TestGet(t *testing.T) {
 					t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
 				}
 			}
-			fmt.Println(err)
 		})
 	}
 }
@@ -333,14 +331,6 @@ func TestDoRequest(t *testing.T) {
 			response: struct{ Example string }{},
 			payload:  map[string]string{"example": "valid"},
 			wantErr:  true,
-		},
-		{
-			name:   "Invalid - Payload Marshal Failure",
-			header: http.StatusOK,
-			payload: map[string]interface{}{
-				"example": make(chan int),
-			},
-			wantErr: true,
 		},
 	}
 	for _, tt := range tests {

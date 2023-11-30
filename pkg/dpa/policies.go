@@ -21,9 +21,10 @@ var (
 // ListPolicies returns all of the currently configured policies
 // Returns types.ListPolicies or types.ErrorResponse based on the
 // response from the API. An error is returned on request failure
+//
 // Example:
 //
-//	resp, errResp, err := s.ListPolicies(context.Background())
+//	resp, dpaerr, err := s.ListPolicies(context.Background())
 //	if err != nil {
 //		log.Fatalf("Failed to list policies. %s", err)
 //		return
@@ -42,10 +43,11 @@ func (s *Service) ListPolicies(ctx context.Context) (*types.ListPolicies, *types
 // GetPolicy returns a specific policy
 // Returns types.Policy or types.ErrorResponse based on the
 // response from the API. An error is returned on request failure
+//
 // Example:
 //
 //	policyID := "c12f982a-ab1a-12ab-1a31-f221aa31836b"
-//	resp, errResp, err := s.ListPolicies(context.Background(), policyID)
+//	resp, dpaerr, err := s.ListPolicies(context.Background(), policyID)
 //	if err != nil {
 //		log.Fatalf("Failed to list policies. %s", err)
 //		return
@@ -74,53 +76,54 @@ func (s *Service) GetPolicy(ctx context.Context, i string) (*types.Policy, *type
 // Expects a struct of type types.Policy
 // Returns types.AddPolicy or types.ErrorResponse based on the
 // response from the API. An error is returned on request failure.
+//
 // Example:
 //
-//	 // Fill out policy Information
-//	 var validSamplePolicy = types.Policy{
-//			 PolicyName: "Test Policy",
-//			 Status:     "Enabled",
-//			 ProvidersData: types.ProvidersData{
-//				 Aws: types.Aws{
-//					 Regions:    []string{"us-east-1"},
-//					 Tags:       []types.Tags{},
-//					 VpcIds:     []string{},
-//					 AccountIds: []string{},
-//				 },
-//			 },
-//			 StartDate: "2024-01-10",
-//			 EndDate:   "2025-01-10",
-//			 UserAccessRules: []types.UserAccessRules{
-//				 {
-//					 RuleName: "Example Rule",
-//					 UserData: types.UserData{
-//						 Roles: []types.Roles{
-//							 {
-//								 Name: "Example Role",
-//							 },
-//						 },
-//					 },
-//					 ConnectionInformation: types.ConnectionInformation{
-//						 ConnectAs: types.ConnectAs{
-//							 Aws: types.ConnectAsAws{
-//								 SSH: "ec2-user",
-//							 },
-//						 },
-//						 GrantAccess: 3,
-//						 IdleTime:    10,
-//						 DaysOfWeek:  []string{"Mon", "Tue"},
-//						 FullDays:    true,
-//						 TimeZone:    "Asia/Jerusalem",
-//					 },
-//				 },
-//			 },
-//		 }
+//	// Fill out policy Information
+//	validSamplePolicy := types.Policy{
+//		PolicyName: "Test Policy",
+//		Status:     "Enabled",
+//		ProvidersData: types.ProvidersData{
+//			Aws: types.Aws{
+//				Regions:    []string{"us-east-1"},
+//				Tags:       []types.Tags{},
+//				VpcIds:     []string{},
+//				AccountIds: []string{},
+//				},
+//			},
+//		StartDate: "2024-01-10",
+//		EndDate:   "2025-01-10",
+//		UserAccessRules: []types.UserAccessRules{
+//			{
+//				RuleName: "Example Rule",
+//				UserData: types.UserData{
+//					Roles: []types.Roles{
+//						{
+//							Name: "Example Role",
+//						},
+//					},
+//				},
+//				ConnectionInformation: types.ConnectionInformation{
+//				ConnectAs: types.ConnectAs{
+//					Aws: types.ConnectAsAws{
+//						SSH: "ec2-user",
+//						},
+//					},
+//				GrantAccess: 3,
+//				IdleTime:    10,
+//				DaysOfWeek:  []string{"Mon", "Tue"},
+//				FullDays:    true,
+//				TimeZone:    "Asia/Jerusalem",
+//				},
+//			},
+//		},
+//	}
 //
-//		 resp, err := s.AddPolicy(context.Background(), validSamplePolicy)
-//		 if err != nil {
-//			 log.Fatalf("Failed to add policy. %s", err)
-//			 return
-//		 }
+//	resp, dpaerr, err := s.AddPolicy(context.Background(), validSamplePolicy)
+//	if err != nil {
+//		log.Fatalf("Failed to add policy. %s", err)
+//		return
+//	}
 func (s *Service) AddPolicy(ctx context.Context, p interface{}) (*types.AddPolicy, *types.ErrorResponse, error) {
 	// Set a timeout for the request
 	ctx, cancelCtx := context.WithTimeout(ctx, 5*time.Second)
@@ -142,6 +145,61 @@ func (s *Service) AddPolicy(ctx context.Context, p interface{}) (*types.AddPolic
 	return &addPolicy, &errorResponse, nil
 }
 
+// Update Policy replaces an existing policy
+// Expects a struct of type types.Policy and a string with the policy ID.
+// Note: The policy ID in the request body must match the policy ID in the path.
+//
+// Returns types.Policy or types.ErrorResponse based on the
+// response from the API. An error is returned on request failure.
+//
+// Example:
+//
+//	// Fill out policy Information
+//	validSamplePolicy := types.Policy{
+//		PolicyName: "Test Policy",
+//		PolicyId: "c12f982a-ab1a-12ab-1a31-f221aa31836a"
+//		Status:     "Enabled",
+//		ProvidersData: types.ProvidersData{
+//			Aws: types.Aws{
+//				Regions:    []string{"us-east-1"},
+//				Tags:       []types.Tags{},
+//				VpcIds:     []string{},
+//				AccountIds: []string{},
+//				},
+//			},
+//		StartDate: "2024-01-10",
+//		EndDate:   "2025-01-10",
+//		UserAccessRules: []types.UserAccessRules{
+//			{
+//				RuleName: "Example Rule",
+//				UserData: types.UserData{
+//					Roles: []types.Roles{
+//						{
+//							Name: "Example Role",
+//						},
+//					},
+//				},
+//				ConnectionInformation: types.ConnectionInformation{
+//				ConnectAs: types.ConnectAs{
+//					Aws: types.ConnectAsAws{
+//						SSH: "ec2-user",
+//						},
+//					},
+//				GrantAccess: 3,
+//				IdleTime:    10,
+//				DaysOfWeek:  []string{"Mon", "Tue"},
+//				FullDays:    true,
+//				TimeZone:    "Asia/Jerusalem",
+//				},
+//			},
+//		},
+//	}
+//
+//	resp, dpaerr, err := s.UpdatePolicy(context.Background(), validSamplePolicy)
+//	if err != nil {
+//		log.Fatalf("Failed to update policy. %s", err)
+//		return
+//	}
 func (s *Service) UpdatePolicy(ctx context.Context, p interface{}, i string) (*types.Policy, *types.ErrorResponse, error) {
 	// Set a timeout for the request
 	ctx, cancelCtx := context.WithTimeout(ctx, 5*time.Second)
@@ -175,15 +233,16 @@ func (s *Service) UpdatePolicy(ctx context.Context, p interface{}, i string) (*t
 // DeletePolicy deletes a specific policy
 // Returns no response if succesfull or types.ErrorResponse based on the
 // response from the API. An error is returned on request failure.
+//
 // Example:
 //
-//	 policyID := "c12f982a-ab1a-12ab-1a31-f221aa31836a"
+//	policyID := "c12f982a-ab1a-12ab-1a31-f221aa31836a"
 //
-//	 resp, err := s.DeletePolicy(context.Background(),policyID)
-//	 if err != nil {
-//		 log.Fatalf("Failed to delete policy. %s", err)
-//		 return
-//	 }
+//	resp, err := s.DeletePolicy(context.Background(),policyID)
+//	if err != nil {
+//		log.Fatalf("Failed to delete policy. %s", err)
+//		return
+//	}
 func (s *Service) DeletePolicy(ctx context.Context, p string) (*types.ErrorResponse, error) {
 	// Set a timeout for the request
 	ctx, cancelCtx := context.WithTimeout(ctx, 5*time.Second)

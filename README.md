@@ -2,14 +2,14 @@
 Contains functions for CyberArk DPA API.
 
 ## Table of Contents <!-- omit in toc -->
-[Usage](#usage)
+- [Usage](#usage)
     - [Service](#service)
     - [Connectors](#connectors)
     - [Discovery](#discovery)
     - [Policies](#policies)
     - [Public Keys](#publickeys)
     - [Settings](#settings)
-[Security](#security)
+- [Security](#security)
 
 
 ## Usage

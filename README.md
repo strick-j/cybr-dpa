@@ -1,3 +1,5 @@
+[![Go Coverage](https://github.com/strick-j/cybr-dpa/wiki/coverage.svg)](https://raw.githack.com/wiki/strick-j/cybr-dpa/coverage.html)
+
 # cybr-dpa  <!-- omit in toc -->
 Contains functions for CyberArk DPA API.
 

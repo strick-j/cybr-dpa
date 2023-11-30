@@ -27,6 +27,7 @@ var (
 //
 // Returns types.ListTargetSetesponse or types.ErrorResponse based on the
 // response from the API. An error is returned on request failure
+//
 // Example:
 //
 //	// List Target Sets with query
